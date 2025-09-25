@@ -7,8 +7,8 @@ The second objective will be the creation of an AI plug-in to be incorporated in
 The project is in line with the FCT call objectives and will follow the European Commission (EU) guidelines and regulations on the responsible use on Generative AI in organizations, this project intents to promote, guide and support the responsible use of generative AI in research, monitoring actively the development and use of generative AI systems, integrate these guidelines into the general research guidelines for good research practices and ethics. We will use open-source software and Generative AI lawfully, ethically and responsibly and according to the AI European Act Regulations and Portuguese Regulations and Guideline. The data collected will be based on data protection and confidentiality defined by the European Regulations as a data management plan based on General Data Protection Regulation. The AGILE project management methodology will be used to develop the AI system platform and the Design Science Research methodology will be used as a research method. We consider this project as innovative, since it will focus on the strategic governance context of the decision-makers of a city council through an interface with citizens and, on the one hand, on optimizing procedures between citizens and the PA entity and on optimizing internal procedures in the categorization and generation of automatic response emails. Knowledge extraction using AI and data science techniques will complement the system by extracting patterns and knowledge for decision making support in the strategic governance context of a municipality.
 
 
-## Project Reference: 
-  - FCT: 2024.07434.IACDC - <a href="https://doi.org/10.54499/2024.07434.IACDC">AI4APGovernance</a>  
+--## Project Reference: 
+--  - FCT: 2024.07434.IACDC - <a href="https://doi.org/10.54499/2024.07434.IACDC">AI4APGovernance</a>  
 ---
 
 ## Project Objectives
