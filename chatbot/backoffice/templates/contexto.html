@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Chatbot Municipal - Contexto</title>
+  <link rel="icon" href="{{ url_for('static', filename='images/chatbot-icon.png') }}" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/chat.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/modal.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <h2>Menu</h2>
+      <ul>
+        <li id="menuContexto" class="active" onclick="window.location.href='{{ url_for('contexto') }}'">Contexto</li>
+        <li id="menuRecursos" onclick="window.location.href='{{ url_for('index') }}'">Recursos</li>
+        <li id="menuRespostas" onclick="window.location.href='{{ url_for('respostas') }}'">FAQs</li>
+      </ul>
+    </aside>
+    <div class="content">
+      <header>
+        <div class="bot-info">
+          <img src="{{ url_for('static', filename='images/chatbot-icon.png') }}" alt="bot">
+          <div>
+            <strong>AI4APGovernance - Inteligência Artificial para a Governança da Administração Pública</strong>
+            <div class="bot-subtext">Chatbot Municipal</div>
+          </div>
+        </div>
+        <button id="publicarBtn">Publicar</button>
+      </header>
+      <div class="panel">
+        <div id="indicadorAtivo" style="display: none;" class="ativo-indicador"></div>
+        <div id="secaoContexto" class="secao left-content" style="display: block !important;">
+          <h2>Contexto do Projeto</h2>
+          <p>Este projeto foi desenvolvido no âmbito da iniciativa <strong>AI4APGovernance</strong>, que visa explorar o potencial da Inteligência Artificial para melhorar os serviços públicos municipais. A interface aqui apresentada serve como backoffice para gerir as interações e recursos do chatbot municipal.</p>
+          <h3>Objetivo</h3>
+          <p>Permitir aos gestores municipais configurar fontes de resposta, adicionar perguntas frequentes (FAQs), associar documentos relevantes e gerir o comportamento do assistente virtual de forma autónoma.</p>
+          <h3>Funcionamento Técnico</h3>
+          <ul>
+            <li>O chatbot utiliza uma base de dados PostgreSQL para armazenar FAQs, documentos e relações.</li>
+            <li>A API backend é construída com Flask (Python) e oferece rotas REST para comunicação entre front e backend.</li>
+            <li>Há suporte para inserção manual de FAQs ou via ficheiro .docx.</li>
+            <li>O sistema suporta seleção de fontes como: FAQ (regras), FAISS (vetores) ou híbrido (com fallback).</li>
+          </ul>
+          <h3>Exemplo da Interface Backoffice</h3>
+          <img src="{{ url_for('static', filename='images/3.png') }}" alt="Interface Principal" style="max-width: 100%; margin-bottom: 15px;">
+          <p>A imagem acima mostra a interface principal do sistema, com o menu lateral, painel de gestão de bots e o chat lateral.</p>
+          <h3>Gestão de Fontes e FAQs</h3>
+          <img src="{{ url_for('static', filename='images/5.png') }}" alt="Gestão de Fontes" style="max-width: 100%; margin-bottom: 15px;">
+          <p>Nesta secção, o gestor pode escolher entre diferentes fontes de resposta, alterar o nome do chatbot e a descrição, bem como alterar a cor do bot e selecionar uma categoria para o bot.</p>
+          <h3>Simulador de Chat</h3>
+          <img src="{{ url_for('static', filename='images/6.png') }}" alt="Chat de Simulação" style="max-width: 100%; margin-bottom: 15px;">
+          <p>À direita, encontra-se o simulador de chat, que permite testar o comportamento do bot e validar as respostas registadas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-sidebar" id="chatSidebar" style="display: none;">
+    <div class="chat-header">
+      <button class="chat-close-btn" onclick="fecharChat()">×</button>
+      <img src="{{ url_for('static', filename='images/chatbot-icon.png') }}" alt="Chatbot" class="chat-header-avatar">
+      <div class="chat-header-info">
+        <h3 id="chatHeaderNomeBot"></h3>
+        <div id="chatFonteBadge"></div>
+      </div>
+    </div>
+    <div class="chat-body" id="chatBody">
+    </div>
+    <div class="chat-input">
+      <input type="text" placeholder="Digite uma mensagem..." id="chatInput" onkeydown="if(event.key==='Enter') enviarPergunta()">
+      <button onclick="enviarPergunta()" title="Enviar">➤</button>
+    </div>
+  </div>
+
+  <!-- Botão para abrir o chat -->
+  <button id="chatToggleBtn" class="chat-toggle-btn">
+    <img src="{{ url_for('static', filename='images/icon-botao.png') }}" alt="Chatbot">
+  </button>
+
+  <!-- Rodapé -->
+  <footer class="rodape">
+    <div class="rodape-content">
+      <span>O Projeto é cofinanciado por:</span>
+      <div class="rodape-logos">
+        <img src="{{ url_for('static', filename='images/prr.png') }}" alt="PRR" class="logo-prr">
+        <img src="{{ url_for('static', filename='images/pt.png') }}" alt="República Portuguesa" class="logo-pt">
+        <img src="{{ url_for('static', filename='images/ue.png') }}" alt="União Europeia" class="logo-ue">
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/globals.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/faq.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/chatbot-bots.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/chatbot-faq.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/modal.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/toggleChat.js') }}"></script>
+</body>
+</html>

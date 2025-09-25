@@ -1,0 +1,2 @@
+educacao: escola, matricula, disciplinas, estudo, propina
+acao_social: apoio social, habitacao, renda, alimentacao, psicologico, habitacional, apoio, habitacao social, cabaz, cabazes, alimentar, alimentares

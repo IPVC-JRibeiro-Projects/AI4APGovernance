@@ -1,0 +1,2 @@
+educacao: school, registration, subjects, study, tuition
+acao_social: social support, housing, rent, food, psychological
