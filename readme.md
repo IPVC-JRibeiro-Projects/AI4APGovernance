@@ -1,4 +1,4 @@
-# Artificial Intelligence for Public Administration Governance
+# AI4APGovernance - Artificial Intelligence for Public Administration Governance
 
 ## Abstract
 Based on Artificial Intelligence (AI), Natural Language Processing, Generative AI and Data Science techniques, the project aims to provide a digital interaction system with an interdisciplinary and citizen-centered perspective, as well as optimize administrative processes to promote and improve strategic governance in Public Administration (PA).  
@@ -7,6 +7,7 @@ The goal is to support digital transformation and automation processes, improvin
 
 From a research perspective and real application in Public Administration, the grant's timing could not be more opportune. The world is on the cusp of a new era in PA, one that is **data-driven and AI-assisted**.  
 
+Project Reference: <a href="https://doi.org/10.54499/2024.07434.IACDC">AI4APGovernance</a>
 ---
 
 ## Project Objectives
