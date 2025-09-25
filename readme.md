@@ -83,7 +83,7 @@ This project aligns with the **FCT call objectives** and follows **European Comm
   <img src="assets/image3.png" alt="Descrição da imagem" width="500"/>
 </p>
 
-### Modul Published Papers:
+### Published Papers:
    
 
    ---
