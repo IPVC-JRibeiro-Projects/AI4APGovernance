@@ -1,82 +1,81 @@
+# Intelligent Assistant with FAISS and Embeddings
 
-# Assistente Inteligente com FAISS e Embeddings
+This project implements an **intelligent chatbot** for public administration governance, using **semantic matching with FAISS**, **Sentence Transformers** for text embeddings, and support for responses based on PDF documents (RAG) integrated with the LLaMA3 model via Ollama. The system organizes questions and answers by categories, supports multilingual functionality (Portuguese and English), and provides an administration interface for managing chatbots and FAQs.
 
-Este projeto implementa um **chatbot inteligente** para governança da administração pública, utilizando **matching semântico com FAISS**, **Sentence Transformers** para embeddings de texto, e suporte a respostas baseadas em documentos PDF (RAG) com integração ao modelo LLaMA3 via Ollama. O sistema organiza perguntas e respostas por categorias, suporta multilinguagem (Português e Inglês) e oferece uma interface de administração para gerenciamento de chatbots e FAQs.
+## Features
 
-## Funcionalidades
+- **FAQ-based responses**: Matching questions based on rules (FAQ) or semantic search (FAISS).
+- **RAG integration**: Support for answers generated from PDF documents using the LLaMA3 model via Ollama.
+- **Multilingual**: Support for Portuguese (pt) and English (en).
+- **Chatbot Management**: Create, edit, and delete chatbots with associated categories.
+- **Document Upload**: Support for uploading .docx (FAQs) and .pdf (RAG) files.
+- **Web Interface**: User interface for chatbot interaction and backoffice for administration.
+- **Question Suggestions**: Display of related and suggested questions based on category and language.
 
-- **Respostas baseadas em FAQs**: Matching de perguntas com base em regras (FAQ) ou busca semântica (FAISS).
-- **Integração com RAG**: Suporte a respostas geradas a partir de documentos PDF utilizando o modelo LLaMA3 via Ollama.
-- **Multilinguagem**: Suporte para Português (pt) e Inglês (en).
-- **Gerenciamento de Chatbots**: Criação, edição e exclusão de chatbots com categorias associadas.
-- **Upload de Documentos**: Suporte para upload de arquivos .docx (FAQs) e .pdf (RAG).
-- **Interface Web**: Interface de utilizador para interação com o chatbot e backoffice para administração.
-- **Sugestões de Perguntas**: Exibição de perguntas relacionadas e sugestivas com base na categoria e idioma.
-
-## Tecnologias Utilizadas
+## Technologies Used
 
 - **Backend**: Flask (Python), PostgreSQL, FAISS, Sentence Transformers, PyPDF2, python-docx.
 - **Frontend**: HTML, CSS, JavaScript.
-- **Integração com IA**: Ollama (LLaMA3) para respostas baseadas em documentos.
-- **Banco de Dados**: PostgreSQL com tabelas para chatbots, FAQs, categorias, documentos e logs.
+- **AI Integration**: Ollama (LLaMA3) for document-based answers.
+- **Database**: PostgreSQL with tables for chatbots, FAQs, categories, documents, and logs.
 
-## Pré-requisitos
+## Prerequisites
 
 - Python 3.8+
 - PostgreSQL
-- Ollama (para suporte a RAG com LLaMA3)
-- Dependências listadas em `requirements.txt`
+- Ollama (for RAG support with LLaMA3)
+- Dependencies listed in `requirements.txt`
 
-## Como executar
+## How to Run
 
-### 1. Configurar o ambiente
+### 1. Set up the environment
 
 ```bash
-# Clonar o repositório
-git clone <URL_DO_REPOSITORIO>
-cd <NOME_DO_REPOSITORIO>
+# Clone the repository
+git clone <REPOSITORY_URL>
+cd <REPOSITORY_NAME>
 
-# Criar e ativar um ambiente virtual
+# Create and activate a virtual environment
 python -m venv venv
 source venv/bin/activate    # Linux/Mac
 venv\Scripts\activate     # Windows
 ```
 
-### 2. Instalar dependências
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Configurar o banco de dados
+### 3. Configure the database
 
-1. Instale o PostgreSQL e crie um banco de dados chamado **AI4Governance**.
-2. Atualize as credenciais de conexão no arquivo `app.py` (host, port, dbname, user, password).
-3. Execute o script SQL para criar as tabelas e inserir dados iniciais:
+1. Install PostgreSQL and create a database named **AI4Governance**.
+2. Update the connection credentials in the `app.py` file (host, port, dbname, user, password).
+3. Run the SQL script to create tables and insert initial data:
 
 ```bash
 psql -U postgres -d AI4Governance -f init.sql
 ```
 
-### 4. Configurar o Ollama (para RAG)
+### 4. Set up Ollama (for RAG)
 
 ```bash
 ollama pull llama3
 ollama serve
 ```
 
-### 5. Iniciar o servidor Flask
+### 5. Start the Flask server
 
 ```bash
 python app.py
 ```
 
-### 6. Acessar a interface
+### 6. Access the interface
 
-- Página inicial: http://localhost:5000/landing.html
+- Homepage: http://localhost:5000/landing.html
 - Backoffice: http://localhost:5000/recursos.html
 
-## Estrutura do Projeto
+## Project Structure
 
 ```
 ├── app.py
@@ -96,20 +95,20 @@ python app.py
 └── README.md
 ```
 
-## Endpoints da API
+## API Endpoints
 
-- **GET /chatbots**: Lista todos os chatbots.
-- **POST /chatbots**: Cria um novo chatbot.
-- **PUT /chatbots/**: Atualiza um chatbot existente.
-- **DELETE /chatbots/**: Exclui um chatbot.
-- **GET /categorias**: Lista todas as categorias.
-- **GET /faqs**: Lista todas as FAQs.
-- **GET /faqs/**: Obtém detalhes de uma FAQ específica.
-- **POST /faqs**: Adiciona uma nova FAQ.
-- **PUT /faqs/**: Atualiza uma FAQ existente.
-- **DELETE /faqs/**: Exclui uma FAQ.
-- **POST /upload-pdf**: Faz upload de arquivos PDF para RAG.
-- **POST /upload-faq-docx**: Faz upload de arquivos .docx para FAQs.
-- **POST /obter-resposta**: Obtém resposta para uma pergunta (suporta FAQ, FAISS e RAG).
-- **POST /perguntas-semelhantes**: Retorna perguntas semelhantes com base na categoria.
-- **POST /faqs-aleatorias**: Retorna FAQs aleatórias para sugestões.
+- **GET /chatbots**: List all chatbots.
+- **POST /chatbots**: Create a new chatbot.
+- **PUT /chatbots/<id>**: Update an existing chatbot.
+- **DELETE /chatbots/<id>**: Delete a chatbot.
+- **GET /categories**: List all categories.
+- **GET /faqs**: List all FAQs.
+- **GET /faqs/<id>**: Get details of a specific FAQ.
+- **POST /faqs**: Add a new FAQ.
+- **PUT /faqs/<id>**: Update an existing FAQ.
+- **DELETE /faqs/<id>**: Delete a FAQ.
+- **POST /upload-pdf**: Upload PDF files for RAG.
+- **POST /upload-faq-docx**: Upload .docx files for FAQs.
+- **POST /get-answer**: Get an answer to a question (supports FAQ, FAISS, and RAG).
+- **POST /similar-questions**: Return similar questions based on category.
+- **POST /random-faqs**: Return random FAQs for suggestions.
