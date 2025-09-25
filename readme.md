@@ -7,7 +7,7 @@ The goal is to support digital transformation and automation processes, improvin
 
 From a research perspective and real application in Public Administration, the grant's timing could not be more opportune. The world is on the cusp of a new era in PA, one that is **data-driven and AI-assisted**.  
 
-Project Reference: <a href="https://doi.org/10.54499/2024.07434.IACDC">AI4APGovernance</a>
+Project Reference: 2024.07434.IACDC - <a href="https://doi.org/10.54499/2024.07434.IACDC">AI4APGovernance</a>
 ---
 
 ## Project Objectives
