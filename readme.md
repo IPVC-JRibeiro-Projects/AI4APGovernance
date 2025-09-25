@@ -29,7 +29,7 @@ The project will deliver **two computational systems**:
 ---
 
 ## Collaboration
-The **Municipality of Viana do Castelo** is a collaborating institution, actively involved in:  
+A **city council (municipality) of the north of Portugal** is a collaborating institution, actively involved in:  
 - Study, design, and development of the project  
 - Local simulation and testing  
 - Ensuring relevance and impact for PA entities  
