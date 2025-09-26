@@ -7,7 +7,7 @@ The first objective will be materialized with the creation of an AI platform as 
 
 The second objective will be the creation of an AI plug-in to be incorporated in the email software for process optimization in administrative services to categorize, prioritize, summarize and propose responses to emails intelligently and with high accuracy and coherence. As an example, an AI plugin can automatically suggest a response to a citizen's email, improving response rates and administrative services. 
 
-This project has the a Council City (Municipality) of the north of Portugal as a collaborating institution and the work plan demonstrates its involvement and commitment to the project as well as the high relevance and impact of the work program for this PA entity, particularly in its involvement in the tasks of the study, design, development and local simulation project, with promising results expected in the improvement of its strategic governance and prospects of its use in other PA entities.
+This project has the collaboration of a public institution (Council City in the north of Portugal) and the work plan demonstrates its involvement and commitment to the project as well as the high relevance and impact of the work program for this PA entity, particularly in its involvement in the tasks of the study, design, development and local simulation project, with promising results expected in the improvement of its strategic governance and prospects of its use in other PA entities.
 
 
 ## Project Objectives
