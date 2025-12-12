@@ -21,7 +21,7 @@ Once the add-on is partially developed, it will be published on Google Workspace
 
 **Gmail:**
 <p>
-    <img src="./assets/Imagem1.png" width="500"/>
+    <img src="./assets/Imagem5.png" width="500"/>
 </p>
 
 **Outlook:**
@@ -34,19 +34,12 @@ Once the add-on is partially developed, it will be published on Google Workspace
 
 **Gmail:**
 <p>
-    <img src="./assets/Imagem2.png" width="500"/>
+    <img src="./assets/Imagem4.png" width="500"/>
 </p>
 
 **Outlook:**
 <p>
     <img src="./assets/resposta gerada.png" width="500"/>
-</p>
-
-### 3. Email after the generated response has been validated
-
-**Gmail:**
-<p>
-    <img src="./assets/Imagem3.png" width="500"/>
 </p>
 
 **Outlook:**
