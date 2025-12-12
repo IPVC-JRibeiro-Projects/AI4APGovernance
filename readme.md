@@ -72,7 +72,7 @@ This project aligns with the **FCT call objectives** and follows **European Comm
 `/email-add-on`  
 
 <p align="center">
-  <img src="assets/image2.png" alt="Descrição da imagem" width="500"/>
+  <img src="assets/image5.png" alt="Descrição da imagem" width="500"/>
 </p>
 
 ---
@@ -90,7 +90,7 @@ This project aligns with the **FCT call objectives** and follows **European Comm
    ---
 
 <p align="center">
-  <img src="assets/image.png" alt="Descrição da imagem" width="500"/>
+  <img src="assets/image4.png" alt="Descrição da imagem" width="500"/>
 </p>
 
 <p align="center">
