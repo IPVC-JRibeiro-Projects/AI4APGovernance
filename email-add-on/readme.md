@@ -3,7 +3,7 @@
 ## Architecture Diagram
 
 <p align="center">
-    <img src="./assets/diagrama_arquitetura.jpg" width="600"/>
+    <img src="./assets/diagrama_arquitetura.png" width="600"/>
 </p>
 
 ## 📚 Project Context
