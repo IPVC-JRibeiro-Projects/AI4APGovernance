@@ -1,4 +1,4 @@
-# Intelligent Assistant with FAISS and Embeddings
+  # Intelligent Assistant with FAISS and Embeddings
 
 This project implements an **intelligent chatbot** for public administration governance, using **semantic matching with FAISS**, **Sentence Transformers** for text embeddings, and support for responses based on PDF documents (RAG) integrated with the LLaMA3 model via Ollama. The system organizes questions and answers by categories, supports multilingual functionality (Portuguese and English), and provides an administration interface for managing chatbots and FAQs.
 
@@ -67,7 +67,7 @@ ollama serve
 ### 5. Start the Flask server
 
 ```bash
-python app.py
+flask --app wsgi --debug run --host 0.0.0.0 --port 5000
 ```
 
 ### 6. Access the interface
@@ -76,25 +76,46 @@ python app.py
 - Backoffice: http://localhost:5000/recursos.html
 
 ## Project Structure
-
 ```
-├── app.py
-├── init.sql
-├── landing.html
-├── recursos.html
-├── js/
-│   ├── chat.js
-│   ├── faq.js
-│   └── AdicionarBot.js
-├── css/
-├── images/
+├── wsgi.py
+├── backoffice/
+│ ├── app/
+│ │ ├── init.py
+│ │ ├── admin.py
+│ │ ├── auth.py
+│ │ ├── api/
+│ │ │ ├── chatbots.py
+│ │ │ ├── faqs.py
+│ │ │ ├── categorias.py
+│ │ │ ├── uploads.py
+│ │ │ └── respostas.py
+│ │ ├── services/
+│ │ │ ├── retreival.py
+│ │ │ ├── rag.py
+│ │ │ └── text.py
+│ │ ├── templates/
+│ │ │ ├── landing.html
+│ │ │ ├── landing-2.html
+│ │ │ ├── recursos.html
+│ │ │ ├── respostas.html
+│ │ │ ├── nao-respondidas.html
+│ │ │ ├── metricas.html
+│ │ │ └── contexto.html
+│ │ └── static/
+│ │ ├── css/
+│ │ ├── js/
+│ │ └── images/
+│ ├── db/
+│ │ └── init.sql
+│ ├── docker-compose.yml
+│ ├── faiss.index
+│ ├── faq_embeddings.pkl
+│ └── requirements.txt
 ├── pdfs/
-├── faiss.index
-├── faq_embeddings.pkl
-├── requirements.txt
+├── static/
+├── .env
 └── README.md
 ```
-
 ## API Endpoints
 
 - **GET /chatbots**: List all chatbots.
@@ -109,6 +130,12 @@ python app.py
 - **DELETE /faqs/<id>**: Delete a FAQ.
 - **POST /upload-pdf**: Upload PDF files for RAG.
 - **POST /upload-faq-docx**: Upload .docx files for FAQs.
-- **POST /get-answer**: Get an answer to a question (supports FAQ, FAISS, and RAG).
-- **POST /similar-questions**: Return similar questions based on category.
-- **POST /random-faqs**: Return random FAQs for suggestions.
+- **POST /obter-resposta**: Get an answer to a question (supports FAQ, FAISS, and RAG).
+- **POST /perguntas-semelhantes**: Return similar questions based on category.
+- **POST /faqs-aleatorias**: Return random FAQs for suggestions.
+- **POST /rebuild-faiss**: Rebuild the FAISS index.
+- **GET /faq-categoria/<categoria>**: List FAQs by category.
+- **GET /perguntas-nao-respondidas**: List unanswered questions.
+- **GET /perguntas-nao-respondidas/metricas**: Metrics for unanswered questions.
+- **PUT /perguntas-nao-respondidas/<id>**: Mark an unanswered question as handled.
+- **DELETE /perguntas-nao-respondidas/<id>**: Delete an unanswered question.
