@@ -2,6 +2,8 @@
 
 This manual explains how to set up and run the chatbot backoffice locally on macOS using Python + virtualenv.
 
+<img width="1183" height="625" alt="image" src="https://github.com/user-attachments/assets/37220084-4b5f-41ee-adb9-5187f5a0982a" />
+
 ## 1. Prerequisites
 
 - Machine with:
