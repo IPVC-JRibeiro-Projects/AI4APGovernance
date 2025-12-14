@@ -77,6 +77,13 @@ This project aligns with the **FCT call objectives** and follows **European Comm
 
 ---
 
+### Module 3 - Chatbot with Avatar
+<p align="center">
+  <img src="assets/image6.png" alt="Chatbot with Avatar" width="500"/>
+</p>
+
+---
+
 ### Module 3 - Dashboard Implementation
 `/dashboards`  
 
