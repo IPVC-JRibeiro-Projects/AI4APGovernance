@@ -1,0 +1,14 @@
+flask
+flask-cors
+psycopg2
+python-dotenv
+PyPDF2
+python-docx
+faiss-cpu
+sentence-transformers
+numpy
+unidecode
+requests
+rapidfuzz
+sympy
+vosk
