@@ -4,12 +4,27 @@
  */
 
 /* global document, Office */
+import { verificarOuCriarImplementacao } from "../services/implementacaoService.js";
 
-Office.onReady((info) => {
+
+Office.onReady(async (info) => {
   if (info.host === Office.HostType.Outlook) {
     document.getElementById("sideload-msg").style.display = "none";
     document.getElementById("app-body").style.display = "flex";
     document.getElementById("run").onclick = run;
+
+    // 🚀 1) Obter email do utilizador
+    const email = Office.context.mailbox.userProfile.emailAddress;
+    console.log("Email do utilizador:", email);
+
+    // 🚀 2) Verificar/criar implementação na API
+    const implementacao = await verificarOuCriarImplementacao(email);
+
+    // 🚀 3) Guardar ID para usar em outros endpoints
+    if (implementacao?.id) {
+      localStorage.setItem("id_implementacao", implementacao.id);
+      console.log("ID implementacao:", implementacao.id);
+    }
   }
 });
 

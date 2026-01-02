@@ -1,34 +1,55 @@
 import Fastify from "fastify";
 import { config } from "./config.js";
-import { verifySecret } from "./utils/auth.js";
+import fastifyCors from "@fastify/cors";
+import rateLimit from "@fastify/rate-limit";
+
+import authRoutes from "./routes/auth.js";
+import { verifyJWT } from "./utils/jwtAuth.js";
 import implementacaoRoutes from "./routes/implementacao.js";
 import categoriaRoutes from "./routes/categoria.js";
 import keywordRoutes from "./routes/keyword.js";
-import fastifyCors from '@fastify/cors';
 import emailRoutes from "./routes/email.js";
-
 
 const fastify = Fastify({
   logger: true,
-  connectionTimeout: 10000, // 10s
+  connectionTimeout: 10000,
   bodyLimit: 1048576,
 });
 
-
+// CORS
 fastify.register(fastifyCors, {
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-secret'],
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization", "x-api-secret"],
 });
 
-// Global security hook
-fastify.addHook("onRequest", verifySecret);
+// Rate limit for auth
+fastify.register(rateLimit, {
+  max: 5,             // máximo de requests
+  timeWindow: "1 minute", // por minuto
+  keyGenerator: (request) => {
+    return request.ip; // limita por IP
+  },
+  allowList: [],
+  errorResponseBuilder: (req, context) => {
+    return {
+      statusCode: 429,
+      error: "Too Many Requests"
+    };
+  },
+});
 
-// Register routes
-fastify.register(implementacaoRoutes);
-fastify.register(categoriaRoutes);
-fastify.register(keywordRoutes);
-fastify.register(emailRoutes);
+// Public routes
+fastify.register(authRoutes, { prefix: "/api/plugin" });
+
+// Protected routes
+fastify.register(async (fastify) => {
+  fastify.addHook("onRequest", verifyJWT);
+  fastify.register(implementacaoRoutes);
+  fastify.register(categoriaRoutes);
+  fastify.register(keywordRoutes);
+  fastify.register(emailRoutes);
+}, { prefix: "/api/plugin" });
 
 // Error handler
 fastify.setErrorHandler((error, request, reply) => {
