@@ -97,9 +97,5 @@ This project aligns with the **FCT call objectives** and follows **European Comm
    ---
 
 <p align="center">
-  <img src="assets/image4.png" alt="Descrição da imagem" width="500"/>
-</p>
-
-<p align="center">
   <img src="assets/financiado por.png" alt="Descrição da imagem" width="500"/>
 </p>
