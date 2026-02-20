@@ -1,0 +1,201 @@
+﻿id_registo,data_registo,unidade_organizacional,tipo_servico,indicador_si,taxa_resolucao,tempo_resposta,satisfacao_cidadao,volume_interacoes,canal_utilizado,taxa_abandono,erros_tecnicos,transparencia,feedback_cidadao,segmentacao_utilizador,area_tematica,indicador_kpi
+1,2024-04-12,Direcção de Serviços Financeiros,Telefone,83.02,87.37,36,3.8,368,presencial,22.41,7,Sim,Processo complicado,Empresa,Cultura,63.13
+2,2024-12-14,Departamento de Inovação e Digitalização,Balcão Único,75.53,89.71,29,4.1,349,email,14.87,1,Sim,Bom serviço,Funcionário Público,Saúde,63.58
+3,2024-09-27,Direcção de Recursos Humanos,Chatbot,85.73,75.96,38,3.3,398,telefone,15.42,5,Não,Processo complicado,Estudante,Inovação,73.64
+4,2024-04-16,Departamento de Planeamento Estratégico,Email,78.33,73.82,57,3.4,74,aplicacao_movel,15.32,11,Sim,Processo complicado,Funcionário Público,Digitalização,99.19
+5,2024-03-12,Direcção de Recursos Humanos,Atendimento Presencial,81.82,70.41,97,4.7,487,portal,7.47,4,Sim,Serviço eficiente,Cidadão,Saúde,63.45
+6,2024-07-07,Serviços de Educação,Telefone,97.66,79.82,101,4.9,186,chatbot,23.38,12,Não,Muito satisfeito,Reforma/Pensionista,Mobilidade,70.35
+7,2024-01-21,Direcção de Recursos Humanos,Telefone,75.44,86.52,27,3.7,12,chatbot,23.68,9,Sim,Muito satisfeito,Reforma/Pensionista,Social,94.57
+8,2024-04-12,Departamento de Inovação e Digitalização,Atendimento Presencial,98.45,80.98,55,3.5,438,chatbot,15.63,8,Sim,Falta de informação,Reforma/Pensionista,Social,50.15
+9,2024-05-01,Direcção de Recursos Humanos,Balcão Único,96.21,82.25,33,4.3,151,email,19.59,11,Sim,Precisa melhorias,Estudante,Saúde,51.99
+10,2024-08-02,Direcção de Serviços Financeiros,Telefone,67.83,95.32,68,3.8,385,presencial,15.31,4,Sim,Serviço eficiente,Reforma/Pensionista,Cultura,80.2
+11,2024-11-26,Direcção de Serviços Financeiros,Serviços Digitais,62.77,79.75,86,3.1,167,telefone,12.11,1,Sim,Falta de informação,Cidadão,Digitalização,95.37
+12,2024-03-28,Gabinete de Atendimento ao Cidadão,Chatbot,64.03,84.39,66,3.3,333,portal,16.52,4,Não,Excelente atendimento,Funcionário Público,Educação,61.94
+13,2024-04-09,Serviços de TI,Email,60.73,91.94,10,4.4,155,aplicacao_movel,13.83,14,Sim,Precisa melhorias,Estudante,Educação,73.48
+14,2024-12-25,Departamento de Saúde Pública,Atendimento Presencial,63.78,81.1,5,4.3,455,portal,14.94,11,Sim,Precisa melhorias,Funcionário Público,Mobilidade,72.52
+15,2024-05-31,Departamento de Planeamento Estratégico,Email,87.32,87.42,74,3.1,302,aplicacao_movel,19.6,3,Sim,Tempo de espera elevado,Estudante,Cultura,73.65
+16,2024-05-10,Serviços de Educação,Serviços Digitais,62.85,94.15,97,3.4,162,email,12.02,14,Sim,Tempo de espera elevado,Funcionário Público,Ambiente,81.13
+17,2024-05-29,Direcção de Recursos Humanos,Telefone,72.76,96.59,118,3.5,441,chatbot,1.02,10,Sim,Resposta rápida e eficaz,Empresa,Ambiente,73.49
+18,2024-11-04,Direcção de Recursos Humanos,Telefone,93.8,74.12,38,4.3,202,email,4.1,6,Sim,Resposta rápida e eficaz,Funcionário Público,Inovação,72.37
+19,2024-09-14,Departamento de Inovação e Digitalização,Serviços Digitais,60.93,95.94,13,3.0,446,presencial,10.97,5,Não,Processo complicado,Reforma/Pensionista,Digitalização,73.71
+20,2024-12-09,Serviços de TI,Atendimento Presencial,92.58,83.78,31,3.2,472,presencial,18.12,13,Sim,Excelente atendimento,Empresa,Digitalização,79.54
+21,2024-10-20,Direcção de Serviços Financeiros,Chatbot,71.27,77.23,47,4.6,82,aplicacao_movel,14.83,1,Sim,Sistema lento,Funcionário Público,Social,76.85
+22,2024-07-10,Departamento de Planeamento Estratégico,Portal Online,64.73,82.86,100,3.4,408,telefone,16.26,11,Sim,Sistema lento,Estudante,Habitação,92.71
+23,2024-10-03,Gabinete de Atendimento ao Cidadão,Atendimento Presencial,87.87,97.44,109,4.3,314,telefone,11.98,10,Sim,Tempo de espera elevado,Estudante,Mobilidade,52.47
+24,2024-06-09,Direcção de Serviços Financeiros,Portal Online,85.16,83.79,88,3.5,386,aplicacao_movel,15.39,10,Sim,Tempo de espera elevado,Estudante,Educação,91.67
+25,2024-11-09,Serviços de Educação,Serviços Digitais,95.1,79.21,52,3.2,353,presencial,8.23,12,Sim,Tempo de espera elevado,Utilizador Vulnerável,Mobilidade,92.2
+26,2024-01-22,Serviços de TI,Balcão Único,89.4,87.74,56,3.5,461,presencial,11.75,4,Não,Serviço eficiente,Cidadão,Ambiente,64.25
+27,2024-09-09,Serviços de Educação,Portal Online,92.14,76.72,15,4.4,149,presencial,18.61,6,Sim,Bom serviço,Estudante,Ambiente,73.14
+28,2024-08-23,Departamento de Saúde Pública,Chatbot,71.28,72.12,29,4.7,196,email,21.8,10,Sim,Resposta rápida e eficaz,Empresa,Saúde,71.93
+29,2024-12-10,Gabinete de Atendimento ao Cidadão,Balcão Único,67.1,73.61,8,4.7,302,presencial,10.84,6,Não,Serviço eficiente,Estudante,Inovação,60.93
+30,2024-02-18,Departamento de Saúde Pública,Portal Online,90.02,73.59,5,3.8,70,portal,1.09,14,Não,Muito satisfeito,Utilizador Vulnerável,Digitalização,69.84
+31,2024-02-28,Departamento de Inovação e Digitalização,Serviços Digitais,92.27,74.25,29,4.3,494,chatbot,4.04,4,Sim,Sistema lento,Reforma/Pensionista,Mobilidade,52.22
+32,2024-06-18,Serviços de Educação,Balcão Único,99.62,73.89,47,3.4,436,presencial,0.52,11,Sim,Precisa melhorias,Empresa,Ambiente,63.89
+33,2024-07-06,Departamento de Inovação e Digitalização,Serviços Digitais,76.5,87.94,68,3.6,389,aplicacao_movel,16.33,14,Sim,Resposta rápida e eficaz,Utilizador Vulnerável,Habitação,90.83
+34,2024-09-27,Direcção de Recursos Humanos,Portal Online,74.88,75.09,76,4.8,207,chatbot,8.31,8,Não,Falta de informação,Reforma/Pensionista,Social,64.23
+35,2024-07-08,Departamento de Saúde Pública,Serviços Digitais,91.06,79.68,45,3.0,304,email,13.56,3,Não,Muito satisfeito,Empresa,Educação,90.91
+36,2024-06-23,Serviços de TI,Chatbot,73.63,95.11,2,3.2,449,aplicacao_movel,12.33,10,Sim,Resposta rápida e eficaz,Funcionário Público,Inovação,76.58
+37,2024-02-20,Serviços de Educação,Portal Online,97.23,83.27,27,3.4,328,chatbot,2.04,2,Não,Serviço eficiente,Cidadão,Habitação,93.99
+38,2024-12-29,Departamento de Planeamento Estratégico,Portal Online,94.34,88.69,95,3.1,311,aplicacao_movel,10.08,14,Sim,Excelente atendimento,Cidadão,Inovação,78.74
+39,2024-02-24,Gabinete de Atendimento ao Cidadão,Portal Online,77.16,74.82,115,3.4,353,email,5.51,3,Sim,Precisa melhorias,Utilizador Vulnerável,Saúde,51.48
+40,2024-08-31,Direcção de Serviços Financeiros,Atendimento Presencial,90.03,75.38,115,4.2,20,portal,10.46,4,Sim,Resposta rápida e eficaz,Reforma/Pensionista,Ambiente,83.77
+41,2024-11-15,Serviços de TI,Atendimento Presencial,90.18,71.14,36,3.8,71,email,5.09,12,Não,Bom serviço,Cidadão,Social,52.24
+42,2024-05-10,Serviços de TI,Atendimento Presencial,64.12,74.73,36,4.8,342,email,21.01,5,Sim,Tempo de espera elevado,Reforma/Pensionista,Habitação,72.53
+43,2024-11-02,Departamento de Inovação e Digitalização,Chatbot,96.1,77.8,26,4.6,235,aplicacao_movel,4.35,2,Não,Tempo de espera elevado,Reforma/Pensionista,Inovação,96.47
+44,2024-05-14,Departamento de Saúde Pública,Balcão Único,80.21,74.96,43,3.7,162,telefone,24.02,1,Não,Precisa melhorias,Utilizador Vulnerável,Digitalização,58.26
+45,2024-01-21,Serviços de Educação,Serviços Digitais,93.06,72.48,27,3.5,208,presencial,10.4,13,Sim,Serviço eficiente,Utilizador Vulnerável,Saúde,69.49
+46,2024-11-24,Serviços de Educação,Telefone,72.8,73.38,69,3.8,61,presencial,21.16,12,Sim,Tempo de espera elevado,Utilizador Vulnerável,Digitalização,86.49
+47,2024-06-15,Direcção de Recursos Humanos,Portal Online,95.82,82.9,20,4.2,269,portal,15.72,3,Sim,Resposta rápida e eficaz,Cidadão,Social,94.11
+48,2024-09-30,Direcção de Recursos Humanos,Serviços Digitais,75.57,75.78,11,3.5,68,portal,18.38,4,Sim,Falta de informação,Utilizador Vulnerável,Habitação,83.55
+49,2024-03-29,Gabinete de Atendimento ao Cidadão,Portal Online,60.43,80.2,74,4.2,81,presencial,19.19,3,Sim,Sistema lento,Cidadão,Saúde,62.91
+50,2024-11-11,Departamento de Inovação e Digitalização,Chatbot,96.22,84.1,104,3.8,157,telefone,12.62,13,Sim,Sistema lento,Utilizador Vulnerável,Habitação,83.73
+51,2024-01-14,Serviços de TI,Portal Online,63.65,89.33,38,4.1,358,presencial,13.58,10,Não,Muito satisfeito,Estudante,Ambiente,64.84
+52,2024-08-29,Serviços de Educação,Atendimento Presencial,72.77,71.1,6,3.9,72,telefone,12.85,12,Sim,Processo complicado,Reforma/Pensionista,Cultura,85.92
+53,2024-09-21,Departamento de Planeamento Estratégico,Telefone,98.0,92.38,72,3.6,319,portal,14.7,14,Sim,Excelente atendimento,Utilizador Vulnerável,Saúde,97.7
+54,2024-12-11,Departamento de Inovação e Digitalização,Email,98.02,87.58,23,4.9,382,chatbot,0.73,11,Sim,Precisa melhorias,Empresa,Digitalização,86.07
+55,2024-02-22,Gabinete de Atendimento ao Cidadão,Portal Online,82.94,72.29,47,4.5,252,aplicacao_movel,9.89,2,Sim,Muito satisfeito,Reforma/Pensionista,Social,93.14
+56,2024-12-05,Gabinete de Atendimento ao Cidadão,Serviços Digitais,85.27,94.46,90,3.3,375,portal,15.15,7,Sim,Processo complicado,Reforma/Pensionista,Ambiente,50.11
+57,2024-04-01,Departamento de Inovação e Digitalização,Atendimento Presencial,77.94,95.78,46,4.7,339,portal,14.94,9,Sim,Serviço eficiente,Utilizador Vulnerável,Cultura,85.88
+58,2024-09-20,Gabinete de Atendimento ao Cidadão,Email,71.73,71.71,107,4.0,116,email,19.82,3,Não,Bom serviço,Funcionário Público,Educação,91.48
+59,2024-02-04,Departamento de Inovação e Digitalização,Telefone,73.15,77.75,12,4.8,235,email,16.38,13,Sim,Bom serviço,Utilizador Vulnerável,Ambiente,52.03
+60,2024-07-24,Direcção de Serviços Financeiros,Email,86.9,92.57,90,4.6,322,email,24.8,1,Não,Excelente atendimento,Reforma/Pensionista,Social,93.58
+61,2024-03-21,Departamento de Inovação e Digitalização,Atendimento Presencial,90.09,90.95,13,3.9,227,aplicacao_movel,7.1,1,Não,Tempo de espera elevado,Empresa,Inovação,62.83
+62,2024-02-19,Departamento de Saúde Pública,Balcão Único,91.66,75.17,104,3.0,434,email,8.98,0,Sim,Resposta rápida e eficaz,Reforma/Pensionista,Saúde,83.26
+63,2024-12-25,Departamento de Inovação e Digitalização,Balcão Único,91.58,75.86,62,3.5,250,telefone,9.6,12,Não,Muito satisfeito,Empresa,Habitação,90.02
+64,2024-01-02,Gabinete de Atendimento ao Cidadão,Email,63.65,80.37,82,4.1,268,presencial,11.65,3,Sim,Muito satisfeito,Cidadão,Social,83.13
+65,2024-02-23,Serviços de Educação,Chatbot,79.78,83.57,89,4.3,385,chatbot,20.9,9,Não,Precisa melhorias,Estudante,Saúde,54.61
+66,2024-04-15,Departamento de Saúde Pública,Serviços Digitais,62.3,87.31,97,3.5,271,portal,5.89,8,Sim,Precisa melhorias,Reforma/Pensionista,Habitação,79.82
+67,2024-09-16,Gabinete de Atendimento ao Cidadão,Serviços Digitais,81.98,80.33,111,3.3,14,telefone,19.4,13,Não,Bom serviço,Utilizador Vulnerável,Mobilidade,77.48
+68,2024-11-05,Direcção de Recursos Humanos,Email,77.66,82.95,104,4.7,270,chatbot,10.13,10,Não,Bom serviço,Cidadão,Digitalização,95.02
+69,2024-07-09,Direcção de Recursos Humanos,Portal Online,95.51,90.93,60,5.0,63,telefone,15.05,6,Não,Falta de informação,Estudante,Educação,70.21
+70,2024-08-05,Serviços de Educação,Portal Online,74.04,71.03,43,4.1,56,telefone,15.81,14,Não,Falta de informação,Utilizador Vulnerável,Ambiente,66.05
+71,2024-02-13,Serviços de Educação,Serviços Digitais,64.68,77.07,76,3.3,224,portal,9.32,11,Sim,Tempo de espera elevado,Funcionário Público,Social,87.49
+72,2024-06-10,Departamento de Saúde Pública,Serviços Digitais,65.72,89.97,108,3.5,186,presencial,12.82,9,Sim,Falta de informação,Utilizador Vulnerável,Educação,70.63
+73,2024-07-20,Direcção de Serviços Financeiros,Balcão Único,90.46,95.07,100,3.0,18,email,10.33,6,Sim,Resposta rápida e eficaz,Empresa,Inovação,82.3
+74,2024-09-26,Serviços de Educação,Chatbot,84.73,84.33,112,4.8,108,aplicacao_movel,1.73,12,Sim,Resposta rápida e eficaz,Empresa,Saúde,82.32
+75,2024-12-16,Direcção de Recursos Humanos,Atendimento Presencial,64.04,84.9,68,3.2,29,presencial,10.93,14,Sim,Muito satisfeito,Funcionário Público,Saúde,94.4
+76,2024-10-30,Departamento de Inovação e Digitalização,Portal Online,63.36,73.0,5,4.2,387,aplicacao_movel,2.43,6,Sim,Sistema lento,Cidadão,Social,79.93
+77,2024-09-27,Gabinete de Atendimento ao Cidadão,Serviços Digitais,88.04,82.53,37,3.5,250,portal,10.13,14,Não,Resposta rápida e eficaz,Estudante,Cultura,75.11
+78,2024-08-02,Direcção de Recursos Humanos,Balcão Único,62.91,84.91,72,4.1,70,portal,14.82,7,Sim,Processo complicado,Utilizador Vulnerável,Cultura,56.94
+79,2024-09-08,Direcção de Recursos Humanos,Telefone,92.87,76.79,106,4.3,388,portal,14.49,0,Não,Bom serviço,Empresa,Mobilidade,55.79
+80,2024-07-08,Direcção de Serviços Financeiros,Balcão Único,88.25,77.54,113,4.7,499,chatbot,16.57,9,Sim,Precisa melhorias,Cidadão,Digitalização,57.72
+81,2024-10-22,Departamento de Saúde Pública,Portal Online,63.25,80.56,92,3.4,428,aplicacao_movel,2.38,12,Não,Falta de informação,Funcionário Público,Habitação,58.59
+82,2024-07-31,Departamento de Saúde Pública,Portal Online,63.39,70.56,31,3.0,187,presencial,16.3,9,Não,Muito satisfeito,Reforma/Pensionista,Inovação,81.89
+83,2024-07-26,Serviços de TI,Balcão Único,99.47,79.02,9,3.3,347,presencial,7.8,7,Sim,Excelente atendimento,Empresa,Educação,87.05
+84,2024-08-24,Direcção de Serviços Financeiros,Atendimento Presencial,74.97,75.92,118,4.8,71,telefone,9.98,3,Sim,Precisa melhorias,Funcionário Público,Cultura,76.5
+85,2024-12-03,Departamento de Inovação e Digitalização,Email,74.83,79.17,51,4.7,154,telefone,21.45,3,Não,Processo complicado,Utilizador Vulnerável,Mobilidade,91.45
+86,2024-02-22,Departamento de Saúde Pública,Portal Online,92.51,73.35,29,4.2,225,telefone,0.23,3,Sim,Falta de informação,Estudante,Mobilidade,99.56
+87,2024-10-06,Gabinete de Atendimento ao Cidadão,Balcão Único,97.89,94.93,78,4.2,12,portal,14.71,5,Sim,Processo complicado,Empresa,Social,91.0
+88,2024-08-04,Serviços de Educação,Serviços Digitais,99.44,86.62,40,4.3,169,presencial,14.97,6,Sim,Bom serviço,Empresa,Inovação,84.74
+89,2024-09-08,Direcção de Serviços Financeiros,Balcão Único,90.14,89.01,41,3.4,236,aplicacao_movel,9.92,5,Sim,Bom serviço,Utilizador Vulnerável,Habitação,76.62
+90,2024-07-06,Serviços de Educação,Chatbot,75.05,92.1,86,4.8,495,portal,5.93,0,Sim,Tempo de espera elevado,Reforma/Pensionista,Digitalização,72.44
+91,2024-02-10,Direcção de Recursos Humanos,Email,63.34,83.96,11,3.8,278,chatbot,5.87,11,Sim,Muito satisfeito,Cidadão,Ambiente,54.22
+92,2024-06-05,Gabinete de Atendimento ao Cidadão,Telefone,91.09,72.43,23,3.8,129,telefone,22.09,7,Sim,Precisa melhorias,Estudante,Social,69.97
+93,2024-01-15,Gabinete de Atendimento ao Cidadão,Atendimento Presencial,82.34,85.04,1,4.0,390,portal,11.05,12,Sim,Serviço eficiente,Empresa,Habitação,95.51
+94,2024-10-27,Direcção de Recursos Humanos,Telefone,76.97,86.43,46,3.1,98,portal,8.27,9,Não,Serviço eficiente,Estudante,Ambiente,90.4
+95,2024-03-05,Direcção de Serviços Financeiros,Email,96.25,90.87,101,3.3,338,chatbot,11.22,14,Sim,Precisa melhorias,Empresa,Ambiente,60.8
+96,2024-12-10,Direcção de Recursos Humanos,Email,64.45,82.09,21,4.5,77,email,16.73,10,Não,Excelente atendimento,Estudante,Inovação,73.33
+97,2024-11-22,Serviços de Educação,Email,79.71,73.57,90,3.2,407,presencial,3.64,12,Sim,Muito satisfeito,Funcionário Público,Inovação,90.84
+98,2024-01-09,Serviços de TI,Telefone,60.45,77.95,110,4.2,366,aplicacao_movel,11.24,6,Sim,Processo complicado,Empresa,Educação,53.37
+99,2024-12-09,Gabinete de Atendimento ao Cidadão,Serviços Digitais,78.75,80.17,36,3.5,107,email,14.7,5,Sim,Excelente atendimento,Estudante,Mobilidade,69.37
+100,2024-05-08,Departamento de Planeamento Estratégico,Email,62.25,88.09,54,3.8,276,telefone,23.71,5,Sim,Sistema lento,Cidadão,Habitação,92.59
+101,2024-05-15,Departamento de Planeamento Estratégico,Balcão Único,64.75,85.98,87,3.6,114,portal,6.31,4,Sim,Precisa melhorias,Funcionário Público,Social,70.19
+102,2024-03-03,Serviços de Educação,Telefone,64.7,79.97,57,3.7,449,chatbot,8.98,5,Sim,Processo complicado,Funcionário Público,Saúde,53.88
+103,2024-05-18,Departamento de Inovação e Digitalização,Email,85.97,97.62,1,4.4,332,chatbot,9.48,11,Sim,Serviço eficiente,Cidadão,Social,77.13
+104,2024-03-21,Departamento de Saúde Pública,Balcão Único,89.84,86.96,63,3.6,132,presencial,15.14,8,Sim,Resposta rápida e eficaz,Estudante,Educação,93.09
+105,2024-06-11,Direcção de Recursos Humanos,Serviços Digitais,83.33,76.64,54,4.1,485,email,8.92,9,Sim,Tempo de espera elevado,Utilizador Vulnerável,Digitalização,79.51
+106,2024-10-15,Direcção de Recursos Humanos,Chatbot,98.49,72.85,55,4.0,38,presencial,13.34,8,Sim,Serviço eficiente,Cidadão,Mobilidade,61.31
+107,2024-09-17,Departamento de Inovação e Digitalização,Serviços Digitais,74.99,74.28,115,4.3,146,portal,19.54,14,Sim,Muito satisfeito,Estudante,Saúde,69.21
+108,2024-08-18,Departamento de Inovação e Digitalização,Email,71.43,76.89,40,4.9,204,presencial,17.63,9,Não,Bom serviço,Cidadão,Cultura,72.51
+109,2024-02-10,Serviços de Educação,Telefone,94.74,74.5,15,4.5,418,aplicacao_movel,11.16,7,Sim,Resposta rápida e eficaz,Cidadão,Digitalização,78.96
+110,2024-01-28,Serviços de Educação,Portal Online,68.94,75.22,21,3.4,235,chatbot,21.61,9,Sim,Tempo de espera elevado,Empresa,Inovação,87.97
+111,2024-05-14,Departamento de Inovação e Digitalização,Email,98.53,77.98,47,3.1,341,chatbot,13.95,8,Não,Tempo de espera elevado,Estudante,Ambiente,54.94
+112,2024-07-19,Gabinete de Atendimento ao Cidadão,Portal Online,60.49,74.85,73,3.5,179,telefone,13.5,12,Sim,Sistema lento,Utilizador Vulnerável,Cultura,94.48
+113,2024-11-23,Serviços de Educação,Balcão Único,98.8,95.11,53,4.2,18,telefone,0.85,9,Sim,Sistema lento,Empresa,Social,50.62
+114,2024-09-24,Serviços de TI,Chatbot,61.73,72.25,9,3.1,472,portal,24.67,7,Não,Falta de informação,Cidadão,Social,68.5
+115,2024-02-02,Serviços de Educação,Atendimento Presencial,95.65,84.69,74,4.0,49,aplicacao_movel,3.07,7,Sim,Serviço eficiente,Reforma/Pensionista,Inovação,51.37
+116,2024-02-17,Direcção de Recursos Humanos,Serviços Digitais,81.11,81.49,52,4.2,34,email,5.78,0,Sim,Serviço eficiente,Cidadão,Educação,69.65
+117,2024-03-02,Serviços de Educação,Chatbot,99.72,97.51,57,3.7,270,presencial,1.29,9,Sim,Serviço eficiente,Cidadão,Habitação,76.29
+118,2024-08-03,Gabinete de Atendimento ao Cidadão,Email,62.95,73.14,117,4.5,404,portal,16.0,10,Sim,Falta de informação,Estudante,Cultura,75.58
+119,2024-10-19,Departamento de Inovação e Digitalização,Portal Online,82.15,81.14,26,3.2,452,telefone,5.62,4,Sim,Excelente atendimento,Estudante,Cultura,58.28
+120,2024-04-08,Direcção de Recursos Humanos,Serviços Digitais,98.77,97.15,41,3.2,235,presencial,4.5,3,Sim,Tempo de espera elevado,Empresa,Digitalização,82.29
+121,2024-06-20,Serviços de Educação,Portal Online,80.92,94.23,35,4.5,481,telefone,2.21,1,Sim,Resposta rápida e eficaz,Utilizador Vulnerável,Mobilidade,52.24
+122,2024-12-25,Gabinete de Atendimento ao Cidadão,Telefone,85.18,92.88,63,4.0,133,presencial,2.58,7,Sim,Muito satisfeito,Empresa,Digitalização,88.1
+123,2024-08-01,Serviços de TI,Portal Online,87.83,77.22,116,4.4,472,email,14.62,2,Não,Tempo de espera elevado,Funcionário Público,Habitação,97.33
+124,2024-02-04,Serviços de Educação,Telefone,78.18,74.78,25,3.9,47,portal,17.21,3,Não,Sistema lento,Cidadão,Social,66.99
+125,2024-08-14,Gabinete de Atendimento ao Cidadão,Balcão Único,85.1,88.72,90,3.5,337,presencial,9.93,11,Sim,Processo complicado,Reforma/Pensionista,Social,75.86
+126,2024-04-10,Serviços de TI,Serviços Digitais,83.37,96.02,75,4.6,260,aplicacao_movel,12.0,6,Sim,Bom serviço,Cidadão,Social,68.95
+127,2024-05-10,Departamento de Inovação e Digitalização,Serviços Digitais,96.05,85.59,38,4.6,398,chatbot,17.15,9,Sim,Falta de informação,Cidadão,Social,50.34
+128,2024-09-13,Serviços de Educação,Atendimento Presencial,61.82,86.01,2,4.4,185,aplicacao_movel,0.43,8,Sim,Precisa melhorias,Empresa,Habitação,69.29
+129,2024-01-05,Serviços de TI,Email,71.24,77.84,7,3.5,99,aplicacao_movel,8.08,1,Sim,Processo complicado,Reforma/Pensionista,Inovação,89.59
+130,2024-08-05,Direcção de Recursos Humanos,Telefone,98.02,91.55,82,4.2,411,chatbot,24.33,2,Sim,Muito satisfeito,Reforma/Pensionista,Mobilidade,79.8
+131,2024-09-11,Departamento de Inovação e Digitalização,Atendimento Presencial,95.61,75.24,91,3.7,463,aplicacao_movel,14.5,3,Não,Serviço eficiente,Reforma/Pensionista,Habitação,55.06
+132,2024-12-24,Direcção de Recursos Humanos,Portal Online,78.23,79.06,34,3.2,46,presencial,6.36,9,Sim,Sistema lento,Empresa,Mobilidade,92.36
+133,2024-10-09,Departamento de Planeamento Estratégico,Portal Online,84.81,81.91,91,4.8,325,presencial,13.04,0,Sim,Sistema lento,Cidadão,Habitação,76.55
+134,2024-07-25,Direcção de Serviços Financeiros,Atendimento Presencial,71.1,84.21,17,3.3,185,presencial,8.57,6,Sim,Sistema lento,Empresa,Social,92.09
+135,2024-01-15,Serviços de Educação,Serviços Digitais,67.52,76.79,43,4.9,470,chatbot,13.31,1,Sim,Serviço eficiente,Estudante,Inovação,79.01
+136,2024-12-11,Serviços de TI,Portal Online,78.55,73.22,59,3.9,293,aplicacao_movel,3.14,4,Não,Precisa melhorias,Estudante,Cultura,77.98
+137,2024-02-11,Direcção de Serviços Financeiros,Balcão Único,74.13,87.1,108,3.4,462,chatbot,3.32,14,Sim,Falta de informação,Empresa,Digitalização,55.26
+138,2024-06-27,Direcção de Serviços Financeiros,Balcão Único,83.35,78.08,51,4.1,470,presencial,3.59,0,Não,Processo complicado,Reforma/Pensionista,Ambiente,58.37
+139,2024-03-03,Serviços de TI,Atendimento Presencial,63.11,86.27,54,4.7,90,aplicacao_movel,23.5,2,Sim,Serviço eficiente,Cidadão,Inovação,98.6
+140,2024-12-17,Departamento de Inovação e Digitalização,Telefone,98.98,74.32,24,4.5,123,aplicacao_movel,18.32,11,Sim,Muito satisfeito,Empresa,Cultura,61.42
+141,2024-08-18,Serviços de Educação,Telefone,99.45,83.47,25,4.6,49,telefone,4.06,1,Sim,Falta de informação,Empresa,Educação,98.87
+142,2024-08-28,Departamento de Planeamento Estratégico,Atendimento Presencial,87.93,84.91,71,4.3,310,telefone,4.71,0,Sim,Muito satisfeito,Empresa,Habitação,76.6
+143,2024-02-21,Direcção de Recursos Humanos,Telefone,81.44,71.45,52,4.4,233,email,18.27,6,Sim,Falta de informação,Funcionário Público,Educação,56.79
+144,2024-04-05,Gabinete de Atendimento ao Cidadão,Serviços Digitais,72.38,79.42,70,4.7,327,portal,3.9,4,Não,Precisa melhorias,Estudante,Cultura,54.97
+145,2024-08-09,Direcção de Recursos Humanos,Serviços Digitais,92.55,73.76,117,3.5,358,telefone,5.86,0,Sim,Bom serviço,Reforma/Pensionista,Inovação,60.44
+146,2024-08-18,Gabinete de Atendimento ao Cidadão,Telefone,87.39,71.77,88,4.0,124,chatbot,24.08,5,Sim,Muito satisfeito,Utilizador Vulnerável,Habitação,96.28
+147,2024-08-24,Direcção de Recursos Humanos,Balcão Único,66.5,97.72,33,3.4,195,telefone,6.38,4,Sim,Serviço eficiente,Reforma/Pensionista,Ambiente,70.71
+148,2024-05-22,Serviços de TI,Telefone,96.44,79.03,49,5.0,332,email,16.54,14,Sim,Falta de informação,Utilizador Vulnerável,Social,69.77
+149,2024-06-19,Departamento de Planeamento Estratégico,Serviços Digitais,92.9,92.68,29,4.9,65,aplicacao_movel,24.47,2,Sim,Sistema lento,Funcionário Público,Habitação,65.66
+150,2024-01-29,Serviços de Educação,Chatbot,97.99,77.13,63,3.1,49,email,9.36,11,Não,Tempo de espera elevado,Empresa,Habitação,57.35
+151,2024-02-05,Gabinete de Atendimento ao Cidadão,Email,89.03,89.08,107,4.4,363,aplicacao_movel,0.44,6,Não,Sistema lento,Funcionário Público,Inovação,74.39
+152,2024-01-13,Serviços de Educação,Portal Online,84.54,91.29,22,4.9,49,aplicacao_movel,6.1,10,Não,Excelente atendimento,Funcionário Público,Inovação,56.5
+153,2024-06-08,Serviços de Educação,Chatbot,76.73,86.68,26,3.4,356,portal,20.77,9,Sim,Bom serviço,Cidadão,Cultura,91.77
+154,2024-11-22,Serviços de Educação,Telefone,97.31,83.2,28,4.1,470,telefone,21.62,8,Sim,Bom serviço,Estudante,Saúde,68.52
+155,2024-07-05,Departamento de Saúde Pública,Balcão Único,94.64,81.53,114,4.8,246,chatbot,19.21,13,Sim,Sistema lento,Utilizador Vulnerável,Habitação,68.74
+156,2024-08-30,Departamento de Inovação e Digitalização,Atendimento Presencial,61.81,79.77,85,3.1,298,chatbot,2.83,12,Sim,Processo complicado,Empresa,Digitalização,73.7
+157,2024-03-26,Direcção de Recursos Humanos,Telefone,61.05,96.03,49,4.4,271,presencial,19.89,12,Não,Precisa melhorias,Utilizador Vulnerável,Habitação,72.21
+158,2024-10-10,Serviços de Educação,Balcão Único,75.06,93.26,71,3.6,225,aplicacao_movel,22.97,8,Sim,Muito satisfeito,Reforma/Pensionista,Cultura,99.74
+159,2024-03-06,Direcção de Recursos Humanos,Email,92.42,97.02,81,4.8,156,chatbot,15.02,13,Sim,Serviço eficiente,Utilizador Vulnerável,Mobilidade,77.27
+160,2024-06-18,Serviços de Educação,Telefone,99.49,73.48,84,4.9,345,portal,23.52,8,Sim,Bom serviço,Reforma/Pensionista,Educação,54.41
+161,2024-02-14,Gabinete de Atendimento ao Cidadão,Serviços Digitais,66.02,90.46,105,4.9,177,aplicacao_movel,20.67,1,Sim,Sistema lento,Estudante,Social,80.34
+162,2024-03-02,Departamento de Inovação e Digitalização,Atendimento Presencial,83.77,96.27,49,3.9,101,portal,16.67,2,Sim,Sistema lento,Reforma/Pensionista,Saúde,57.58
+163,2024-05-13,Departamento de Inovação e Digitalização,Balcão Único,75.24,75.07,20,4.7,362,chatbot,14.43,6,Sim,Precisa melhorias,Utilizador Vulnerável,Ambiente,51.55
+164,2024-10-10,Serviços de TI,Balcão Único,98.8,71.86,118,4.7,68,chatbot,8.71,4,Sim,Precisa melhorias,Utilizador Vulnerável,Ambiente,98.54
+165,2024-01-28,Departamento de Saúde Pública,Balcão Único,93.68,90.75,86,3.6,68,presencial,3.98,1,Sim,Resposta rápida e eficaz,Reforma/Pensionista,Ambiente,88.68
+166,2024-04-17,Serviços de TI,Email,93.53,86.09,92,4.7,313,chatbot,15.12,2,Sim,Resposta rápida e eficaz,Funcionário Público,Inovação,99.01
+167,2024-02-13,Serviços de TI,Telefone,78.75,93.57,63,3.1,178,aplicacao_movel,7.95,9,Não,Processo complicado,Estudante,Ambiente,73.89
+168,2024-12-05,Serviços de TI,Email,76.59,73.91,61,4.2,278,aplicacao_movel,21.66,5,Não,Processo complicado,Cidadão,Social,76.61
+169,2024-10-12,Serviços de TI,Portal Online,70.94,92.27,104,3.5,372,aplicacao_movel,24.83,12,Não,Excelente atendimento,Empresa,Educação,58.42
+170,2024-11-26,Serviços de TI,Portal Online,62.26,75.65,49,3.2,54,presencial,18.81,6,Não,Processo complicado,Utilizador Vulnerável,Ambiente,62.35
+171,2024-05-07,Departamento de Planeamento Estratégico,Telefone,94.59,74.58,71,3.2,354,presencial,2.26,8,Sim,Falta de informação,Empresa,Habitação,91.93
+172,2024-12-13,Departamento de Inovação e Digitalização,Serviços Digitais,92.52,74.6,1,4.4,190,chatbot,7.22,0,Sim,Precisa melhorias,Cidadão,Habitação,67.81
+173,2024-08-18,Serviços de TI,Email,99.99,92.81,96,3.7,179,email,2.73,10,Sim,Serviço eficiente,Empresa,Inovação,91.34
+174,2024-07-08,Serviços de Educação,Atendimento Presencial,99.87,88.63,13,4.4,365,email,16.26,6,Sim,Falta de informação,Cidadão,Social,85.45
+175,2024-08-12,Departamento de Inovação e Digitalização,Balcão Único,82.22,84.65,94,3.1,200,presencial,19.13,7,Não,Muito satisfeito,Reforma/Pensionista,Educação,58.86
+176,2024-10-09,Departamento de Inovação e Digitalização,Balcão Único,90.76,80.05,87,3.6,164,chatbot,23.14,11,Sim,Sistema lento,Funcionário Público,Saúde,75.37
+177,2024-04-30,Direcção de Serviços Financeiros,Telefone,97.79,94.56,51,4.1,431,email,10.95,13,Não,Processo complicado,Utilizador Vulnerável,Cultura,83.87
+178,2024-04-25,Departamento de Planeamento Estratégico,Serviços Digitais,93.99,80.99,56,4.6,197,chatbot,22.53,2,Sim,Sistema lento,Cidadão,Educação,61.75
+179,2024-08-20,Serviços de TI,Portal Online,69.89,92.86,83,3.6,16,chatbot,21.95,3,Sim,Bom serviço,Empresa,Cultura,91.53
+180,2024-09-15,Direcção de Recursos Humanos,Portal Online,78.02,82.3,62,4.3,142,chatbot,7.93,9,Sim,Excelente atendimento,Utilizador Vulnerável,Mobilidade,77.24
+181,2024-12-24,Gabinete de Atendimento ao Cidadão,Balcão Único,65.17,80.55,32,4.8,244,telefone,21.72,5,Não,Bom serviço,Funcionário Público,Cultura,58.26
+182,2024-07-16,Departamento de Saúde Pública,Telefone,98.16,82.96,30,4.2,54,aplicacao_movel,9.39,9,Sim,Excelente atendimento,Reforma/Pensionista,Digitalização,79.15
+183,2024-05-16,Serviços de Educação,Email,84.25,78.44,29,3.5,323,chatbot,7.42,6,Sim,Resposta rápida e eficaz,Utilizador Vulnerável,Habitação,99.99
+184,2024-11-13,Direcção de Recursos Humanos,Portal Online,69.15,90.93,49,3.0,258,telefone,16.23,12,Sim,Sistema lento,Cidadão,Social,57.53
+185,2024-06-13,Departamento de Planeamento Estratégico,Email,86.87,84.08,45,4.7,40,presencial,8.21,13,Sim,Excelente atendimento,Funcionário Público,Inovação,90.84
+186,2024-08-12,Gabinete de Atendimento ao Cidadão,Serviços Digitais,84.73,76.5,93,3.0,32,email,15.76,3,Sim,Tempo de espera elevado,Empresa,Digitalização,60.37
+187,2024-11-02,Departamento de Planeamento Estratégico,Portal Online,74.33,95.19,30,4.7,435,aplicacao_movel,15.25,7,Sim,Falta de informação,Funcionário Público,Cultura,89.12
+188,2024-08-21,Serviços de Educação,Portal Online,64.54,80.75,16,4.1,403,email,14.09,4,Sim,Excelente atendimento,Funcionário Público,Ambiente,86.73
+189,2024-06-20,Departamento de Inovação e Digitalização,Chatbot,86.86,85.22,40,4.9,169,aplicacao_movel,9.51,0,Sim,Excelente atendimento,Estudante,Social,65.02
+190,2024-05-31,Gabinete de Atendimento ao Cidadão,Portal Online,80.81,95.38,19,4.6,372,email,13.71,3,Sim,Falta de informação,Funcionário Público,Digitalização,66.29
+191,2024-11-10,Departamento de Inovação e Digitalização,Atendimento Presencial,90.89,87.48,18,5.0,446,aplicacao_movel,14.91,2,Sim,Sistema lento,Funcionário Público,Inovação,89.63
+192,2024-06-08,Serviços de Educação,Telefone,80.81,73.27,1,3.7,167,email,13.64,8,Sim,Sistema lento,Utilizador Vulnerável,Habitação,73.07
+193,2024-04-05,Direcção de Recursos Humanos,Telefone,94.09,96.32,78,4.5,48,email,11.11,7,Sim,Falta de informação,Empresa,Social,86.54
+194,2024-08-20,Serviços de Educação,Email,82.08,87.58,115,3.8,424,email,0.37,0,Sim,Bom serviço,Utilizador Vulnerável,Inovação,57.4
+195,2024-06-28,Direcção de Recursos Humanos,Serviços Digitais,82.44,79.38,47,4.0,91,email,14.68,10,Sim,Tempo de espera elevado,Utilizador Vulnerável,Mobilidade,92.63
+196,2024-04-22,Gabinete de Atendimento ao Cidadão,Portal Online,95.07,73.9,114,4.3,365,presencial,4.21,5,Não,Serviço eficiente,Cidadão,Mobilidade,85.54
+197,2024-11-13,Gabinete de Atendimento ao Cidadão,Atendimento Presencial,76.14,92.23,66,4.7,267,chatbot,16.06,8,Sim,Muito satisfeito,Utilizador Vulnerável,Inovação,95.35
+198,2024-02-21,Serviços de TI,Email,65.36,87.36,118,5.0,215,portal,18.98,6,Sim,Tempo de espera elevado,Estudante,Digitalização,56.62
+199,2024-09-24,Departamento de Planeamento Estratégico,Chatbot,61.15,84.94,92,4.5,86,telefone,12.51,3,Sim,Sistema lento,Estudante,Social,79.65
+200,2024-10-21,Serviços de TI,Email,90.21,95.03,113,3.8,486,portal,13.56,12,Sim,Serviço eficiente,Cidadão,Digitalização,79.96
