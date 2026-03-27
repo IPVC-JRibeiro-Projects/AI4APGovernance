@@ -20,12 +20,18 @@
   text-align: left;
   max-width: 1000px;
   width: 98vw;
-  box-shadow: 0 8px 48px rgba(31,41,55,0.22);
-  animation: modalUp 0.24s cubic-bezier(.47,1.64,.41,.8);
+  box-shadow: 0 8px 48px rgba(31, 41, 55, 0.22);
+  animation: modalUp 0.24s cubic-bezier(0.47, 1.64, 0.41, 0.8);
 }
 @keyframes modalUp {
-  from { transform: translateY(50px) scale(.98); opacity: 0.4; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
+  from {
+    transform: translateY(50px) scale(0.98);
+    opacity: 0.4;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
 .modal-box h2 {
@@ -55,8 +61,52 @@
   border-radius: 7px;
   font-size: 15px;
   background: #f7f8fa;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   transition: border 0.19s;
+}
+
+/* Categories view-only list (compact + scrollable) */
+.categorias-list-view {
+  width: 100%;
+  min-height: 90px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #f7f8fa;
+  border: 1px solid #dadada;
+  border-radius: 7px;
+  padding: 10px 12px;
+  margin-bottom: 13px;
+  font-size: 14px;
+  color: #222;
+}
+.categorias-list-view .cat-item {
+  padding: 4px 0;
+  border-bottom: 1px dashed #e5e7eb;
+}
+.categorias-list-view .cat-item:last-child {
+  border-bottom: none;
+}
+
+/* Checkbox (evitar herdar width:100% dos inputs do modal) */
+.modal-box input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  height: 18px;
+  min-height: 18px;
+}
+
+.video-enabled-row {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #2b2b2b;
+}
+
+.video-enabled-row span {
+  line-height: 1.2;
 }
 .modal-box input:focus,
 .modal-box textarea:focus,
@@ -85,7 +135,7 @@
   margin-bottom: 12px;
   cursor: pointer;
   transition: background 0.17s;
-  box-shadow: 0 1px 5px rgba(212,175,55,0.11);
+  box-shadow: 0 1px 5px rgba(212, 175, 55, 0.11);
 }
 
 .modal-box .btn-bar,
@@ -154,9 +204,38 @@
   width: 98vw;
   padding: 48px 44px 36px 44px;
   border-radius: 22px;
-  box-shadow: 0 10px 60px rgba(31,41,55,0.18);
+  box-shadow: 0 10px 60px rgba(31, 41, 55, 0.18);
   background: #fff;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
+  max-height: 86vh;
+  overflow-y: auto;
+}
+
+/* Create-bot modal: section titles should be left-aligned */
+.modal-box-novo-bot-exclusivo .section-title {
+  text-align: left;
+}
+
+/* Create-bot modal: prettier video-enabled checkbox row */
+.modal-box-novo-bot-exclusivo .video-enabled-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid #dadada;
+  background: #fafafa;
+  margin: 10px 0 14px 0;
+}
+
+.modal-box-novo-bot-exclusivo .video-enabled-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.modal-box-novo-bot-exclusivo .video-enabled-row span {
+  line-height: 1.35;
 }
 .modal-box-novo-bot-exclusivo h2 {
   font-size: 28px;
@@ -172,9 +251,19 @@
   width: 98vw;
   padding: 40px 38px 28px 38px;
   border-radius: 22px;
-  box-shadow: 0 10px 60px rgba(31,41,55,0.17);
+  box-shadow: 0 10px 60px rgba(31, 41, 55, 0.17);
   background: #fff;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
+  max-height: 86vh;
+  overflow-y: auto;
+}
+
+/* Keep video_enabled label on a single line (as requested) */
+.modal-box-editar-chatbot-exclusivo label[for="editarVideoEnabledChatbot"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
 }
 .modal-box-editar-chatbot-exclusivo h2 {
   font-size: 28px;
@@ -211,28 +300,28 @@
 #editarCategoriasContainer,
 .categorias-row {
   display: flex;
-  gap: 18px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: flex-start;
   margin-top: 6px;
   padding-bottom: 4px;
+  max-height: 180px;
+  overflow-y: auto;
 }
 
 .categorias-row label,
 #editarCategoriasContainer label {
-  white-space: nowrap;
-  font-size: 1.02em;
-  max-width: 160px;     
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  font-size: 0.98em;
+  max-width: 220px;
+  line-height: 1.3;
 }
 
 #editarCategoriasContainer::-webkit-scrollbar {
-  height: 7px;
+  width: 8px;
 }
 #editarCategoriasContainer::-webkit-scrollbar-thumb {
-  background: #eee;
+  background: #e0e0e0;
   border-radius: 8px;
 }
 
@@ -240,10 +329,12 @@
   max-width: 1000px;
   min-width: 400px;
   width: 98vw;
+  max-height: 88vh;
+  overflow-y: auto;
   border-radius: 22px;
-  box-shadow: 0 10px 60px rgba(31,41,55,0.18);
+  box-shadow: 0 10px 60px rgba(31, 41, 55, 0.18);
   background: #fff;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   padding: 38px 34px 28px 34px;
 }
 .modal-box-adicionar-faq-exclusivo h2 {
@@ -262,6 +353,37 @@
   text-align: center;
   padding: 34px 26px 24px 26px;
   border-radius: 16px;
+}
+
+/* Cancel video job modal: bigger title + proper close button placement */
+.modal-box-cancel-video {
+  position: relative;
+  max-width: 560px;
+  padding-top: 40px;
+}
+
+.modal-close-x {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: 800;
+  color: #6b5f2a;
+  line-height: 1;
+}
+
+.modal-close-x:hover {
+  color: #d4af37;
+}
+
+.modal-cancel-title {
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1.1;
+  margin: 0 0 18px 0;
 }
 .modal-box-confirmacao p {
   font-size: 18px;
@@ -313,7 +435,7 @@
   align-items: center;
   justify-content: center;
   transition: background 0.18s;
-  box-shadow: 0 1px 5px rgba(255,94,94,0.08);
+  box-shadow: 0 1px 5px rgba(255, 94, 94, 0.08);
   cursor: pointer;
 }
 
@@ -366,7 +488,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: background 0.17s;
-  box-shadow: 0 1px 5px rgba(212,175,55,0.11);
+  box-shadow: 0 1px 5px rgba(212, 175, 55, 0.11);
 }
 
 .btn-adicionar-faq-modal:hover,
@@ -481,7 +603,7 @@
   cursor: pointer;
   transition: background 0.14s;
   margin-left: auto;
-  box-shadow: 0 1px 4px rgba(255,94,94,0.09);
+  box-shadow: 0 1px 4px rgba(255, 94, 94, 0.09);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -509,7 +631,7 @@
   justify-content: center;
   cursor: pointer;
   transition: background 0.16s;
-  box-shadow: 0 1px 6px rgba(212,175,55,0.12);
+  box-shadow: 0 1px 6px rgba(212, 175, 55, 0.12);
 }
 .btn-adicionar-categoria:hover,
 .btn-adicionar-cat:hover {
@@ -533,7 +655,7 @@
   cursor: pointer;
   margin-top: 0;
   margin-left: 0;
-  box-shadow: 0 1px 5px rgba(255,94,94,0.09);
+  box-shadow: 0 1px 5px rgba(255, 94, 94, 0.09);
 }
 .btn-fechar-categorias:hover {
   background: #e03939;
@@ -546,4 +668,4 @@
   margin-top: 18px;
   flex-direction: row;
   align-items: center;
-} 
+}

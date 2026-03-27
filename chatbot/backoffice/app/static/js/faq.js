@@ -70,7 +70,7 @@ function mostrarPromptRAG(perguntaOriginal, chatbotId) {
         link.textContent = "A pesquisar...";
         link.style.pointerEvents = "none";
         window.awaitingRagConfirmation = false;
-      }
+      };
     }
   }, 80);
 }
@@ -86,12 +86,12 @@ function enviarPerguntaRAG() {
       pergunta,
       chatbot_id: chatbotId,
       fonte: "faq+raga",
-      feedback: "try_rag"
-    })
+      feedback: "try_rag",
+    }),
   })
-    .then(res => res.json())
-    .then(data => {
-      document.querySelectorAll('.rag-btn-bar').forEach(el => el.remove());
+    .then((res) => res.json())
+    .then((data) => {
+      document.querySelectorAll(".rag-btn-bar").forEach((el) => el.remove());
       window.awaitingRagConfirmation = false;
       if (data.success) {
         adicionarMensagem("bot", data.resposta || "");
@@ -104,10 +104,7 @@ function enviarPerguntaRAG() {
     })
     .catch(() => {
       window.awaitingRagConfirmation = false;
-      adicionarMensagem(
-        "bot",
-        "❌ Erro ao comunicar com o servidor (RAG)."
-      );
+      adicionarMensagem("bot", "❌ Erro ao comunicar com o servidor (RAG).");
     });
 }
 
@@ -118,20 +115,31 @@ async function carregarChatbots() {
     const selects = document.querySelectorAll('select[name="chatbot_id"]');
     if (selects.length) {
       const chatbotIdSelecionado = localStorage.getItem("chatbotSelecionado");
-      selects.forEach(select => {
-        select.innerHTML = '<option value="">Selecione o Chatbot</option>' +
+      selects.forEach((select) => {
+        select.innerHTML =
+          '<option value="">Selecione o Chatbot</option>' +
           '<option value="todos">Todos os Chatbots</option>' +
-          chatbots.map(bot => `<option value="${String(bot.chatbot_id)}">${bot.nome}</option>`).join('');
+          chatbots
+            .map(
+              (bot) =>
+                `<option value="${String(bot.chatbot_id)}">${bot.nome}</option>`
+            )
+            .join("");
 
         const estaEmFormulario = !!select.closest("form");
-        if (!estaEmFormulario && chatbotIdSelecionado && !isNaN(parseInt(chatbotIdSelecionado))) {
+        if (
+          !estaEmFormulario &&
+          chatbotIdSelecionado &&
+          !isNaN(parseInt(chatbotIdSelecionado))
+        ) {
           select.value = chatbotIdSelecionado;
         }
 
         select.addEventListener("change", () => {
           const val = select.value;
           window.chatbotSelecionado = val === "todos" ? null : parseInt(val);
-          if (val !== "todos") carregarTabelaFAQs(window.chatbotSelecionado, true);
+          if (val !== "todos")
+            carregarTabelaFAQs(window.chatbotSelecionado, true);
         });
       });
 
@@ -143,8 +151,14 @@ async function carregarChatbots() {
 
     const filtro = document.getElementById("filtroChatbot");
     if (filtro) {
-      filtro.innerHTML = `<option value="">Todos os Chatbots</option>` +
-        chatbots.map(bot => `<option value="${String(bot.chatbot_id)}">${bot.nome}</option>`).join('');
+      filtro.innerHTML =
+        `<option value="">Todos os Chatbots</option>` +
+        chatbots
+          .map(
+            (bot) =>
+              `<option value="${String(bot.chatbot_id)}">${bot.nome}</option>`
+          )
+          .join("");
     }
   } catch (err) {
     console.error("❌ Erro ao carregar chatbots:", err);
@@ -156,35 +170,49 @@ async function carregarTabelaFAQsBackoffice() {
   if (!lista) return;
   lista.innerHTML = "<p>A carregar FAQs...</p>";
 
-  const textoPesquisa = (document.getElementById("pesquisaFAQ")?.value || "").toLowerCase();
+  const textoPesquisa = (
+    document.getElementById("pesquisaFAQ")?.value || ""
+  ).toLowerCase();
   const filtroChatbot = document.getElementById("filtroChatbot")?.value || "";
   const filtroIdioma = document.getElementById("filtroIdioma")?.value || "";
 
   try {
     const [faqs, chatbots, categorias] = await Promise.all([
-      fetch("/faqs/detalhes").then(r => r.json()),
-      fetch("/chatbots").then(r => r.json()),
-      fetch("/categorias").then(r => r.json())
+      fetch("/faqs/detalhes").then((r) => r.json()),
+      fetch("/chatbots").then((r) => r.json()),
+      fetch("/categorias").then((r) => r.json()),
     ]);
 
     const chatbotsMap = {};
-    chatbots.forEach(bot => chatbotsMap[bot.chatbot_id] = bot.nome);
+    const chatbotsVideoEnabled = {};
+    chatbots.forEach((bot) => {
+      chatbotsMap[bot.chatbot_id] = bot.nome;
+      chatbotsVideoEnabled[bot.chatbot_id] = !!bot.video_enabled;
+    });
     const categoriasMap = {};
-    categorias.forEach(cat => categoriasMap[cat.categoria_id] = cat.nome);
+    categorias.forEach((cat) => (categoriasMap[cat.categoria_id] = cat.nome));
 
-    let faqsFiltradas = faqs.filter(faq => {
+    let faqsFiltradas = faqs.filter((faq) => {
       let matchPesquisa = true;
       if (textoPesquisa) {
         const target =
-          (faq.designacao || "") + " " +
-          (faq.pergunta || "") + " " +
+          (faq.identificador || "") +
+          (faq.designacao || "") +
+          " " +
+          (faq.pergunta || "") +
+          " " +
+          (faq.serve_text || "") +
+          " " +
           (faq.resposta || "");
         matchPesquisa = target.toLowerCase().includes(textoPesquisa);
       }
       let matchChatbot = true;
-      if (filtroChatbot) matchChatbot = String(faq.chatbot_id) === filtroChatbot;
+      if (filtroChatbot)
+        matchChatbot = String(faq.chatbot_id) === filtroChatbot;
       let matchIdioma = true;
-      if (filtroIdioma) matchIdioma = (faq.idioma || "").toLowerCase() === filtroIdioma.toLowerCase();
+      if (filtroIdioma)
+        matchIdioma =
+          (faq.idioma || "").toLowerCase() === filtroIdioma.toLowerCase();
 
       return matchPesquisa && matchChatbot && matchIdioma;
     });
@@ -194,63 +222,204 @@ async function carregarTabelaFAQsBackoffice() {
         <thead>
           <tr>
             <th>Chatbot</th>
+            <th>Identificador</th>
             <th>Descrição</th>
             <th>Pergunta</th>
             <th>Documento</th>
             <th>Idioma</th>
             <th>Categorias da FAQ</th>
             <th>Recomendações</th>
+            <th>Vídeo</th>
             <th>Ações</th>
           </tr>
         </thead>
         <tbody>
-          ${faqsFiltradas.map(faq => {
-            let docLinks = "";
-            if (faq.links_documentos && faq.links_documentos.trim()) {
-              docLinks = faq.links_documentos.split(",").map(link => {
-                link = link.trim();
-                if (!link) return "";
-                return `
+          ${faqsFiltradas
+            .map((faq) => {
+              let docLinks = "";
+              if (faq.links_documentos && faq.links_documentos.trim()) {
+                docLinks = faq.links_documentos
+                  .split(",")
+                  .map((link) => {
+                    link = link.trim();
+                    if (!link) return "";
+                    return `
                   <a href="${link}" target="_blank" style="display:inline-block;">
-                    <img src="images/pdf-icon.png" alt="PDF" title="Abrir documento PDF" style="width:26px;vertical-align:middle;">
+                    <img src="/static/images/ui/pdf-icon.png" alt="PDF" title="Abrir documento PDF" style="width:26px;vertical-align:middle;">
                   </a>
                 `;
-              }).join(" ");
-            }
-            let flag = "-";
-            if (faq.idioma === "pt" || faq.idioma?.toLowerCase() === "português") {
-              flag = '<img src="/static/images/pt.jpg" style="height:20px" title="Português">';
-            } else if (faq.idioma === "en" || faq.idioma?.toLowerCase() === "inglês" || faq.idioma?.toLowerCase() === "english") {
-              flag = '<img src="/static/images/en.png" style="height:20px" title="English">';
-            } else if (faq.idioma) {
-              flag = faq.idioma;
-            }
-            let recomendacao = faq.recomendado
-              ? '<span style="color:green;font-size:18px;">✅ Sim</span>'
-              : '<span style="color:#cc2424;font-size:18px;">❌ Não</span>';
-            return `
+                  })
+                  .join(" ");
+              }
+              let flag = "-";
+              if (
+                faq.idioma === "pt" ||
+                faq.idioma?.toLowerCase() === "português"
+              ) {
+                flag =
+                  '<img src="/static/images/flags/pt.jpg" style="height:20px" title="Português">';
+              } else if (
+                faq.idioma === "en" ||
+                faq.idioma?.toLowerCase() === "inglês" ||
+                faq.idioma?.toLowerCase() === "english"
+              ) {
+                flag =
+                  '<img src="/static/images/flags/en.png" style="height:20px" title="English">';
+              } else if (faq.idioma) {
+                flag = faq.idioma;
+              }
+              let recomendacao = faq.recomendado
+                ? '<span style="color:green;font-weight:600;">Sim</span>'
+                : '<span style="color:#cc2424;font-weight:600;">Não</span>';
+
+              let videoCol = "-";
+              // Only show video status if video_status is actually set (not null/undefined)
+              if (faq.video_status) {
+                if (
+                  faq.video_status === "processing" ||
+                  faq.video_status === "queued"
+                ) {
+                  videoCol =
+                    '<span style="color:#d97706;">⏳ a processar</span>';
+                } else if (faq.video_status === "ready" && faq.video_path) {
+                  videoCol = `<a href="/video/faq/${faq.faq_id}" target="_blank" style="color:#2563eb;">▶ Ver vídeo</a>`;
+                } else if (faq.video_status === "failed") {
+                  videoCol = '<span style="color:#b91c1c;">❌ falhou</span>';
+                }
+              }
+              return `
               <tr>
                 <td>${chatbotsMap[faq.chatbot_id] || "-"}</td>
+                <td>${faq.identificador || "-"}</td>
                 <td>${faq.designacao || "-"}</td>
                 <td>${faq.pergunta || "-"}</td>
                 <td class="col-pdf">${docLinks || "-"}</td>
                 <td>${flag}</td>
-                <td>${faq.categoria_nome || categoriasMap[faq.categoria_id] || "-"}</td>
+                <td>${
+                  faq.categoria_nome || categoriasMap[faq.categoria_id] || "-"
+                }</td>
                 <td style="text-align:center;">${recomendacao}</td>
+                <td style="text-align:center;">${videoCol}</td>
                 <td>
-                  <button class="btn-remover" onclick="pedirConfirmacao(${faq.faq_id})">Remover</button>
-                  <button class="btn-editar" onclick="editarFAQ(${faq.faq_id})">Editar</button>
+                  ${(() => {
+                    const botVideo = !!chatbotsVideoEnabled[faq.chatbot_id];
+                    const hasReadyVideo =
+                      faq.video_status === "ready" && !!faq.video_path;
+                    const isGenerating =
+                      faq.video_status === "processing" ||
+                      faq.video_status === "queued";
+                    const canGenerate =
+                      botVideo && !hasReadyVideo && !isGenerating;
+                    return `
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <button class="btn-remover" onclick="pedirConfirmacao(${
+                          faq.faq_id
+                        })">Remover</button>
+                        ${
+                          canGenerate
+                            ? `<button class="btn-editar" onclick="pedirConfirmacaoGerarVideo(${faq.faq_id})">Gerar Vídeo</button>`
+                            : ""
+                        }
+                        <button class="btn-editar" onclick="editarFAQ(${
+                          faq.faq_id
+                        })">Editar</button>
+                      </div>
+                    `;
+                  })()}
                 </td>
               </tr>
             `;
-          }).join("")}
+            })
+            .join("")}
         </tbody>
       </table>
     `;
+
+    // Auto-refresh enquanto houver FAQs com vídeo em processamento/queued
+    try {
+      if (
+        Array.isArray(faqsFiltradas) &&
+        faqsFiltradas.some(
+          (f) => f.video_status === "processing" || f.video_status === "queued"
+        )
+      ) {
+        setTimeout(() => {
+          try {
+            carregarTabelaFAQsBackoffice();
+          } catch (e) {}
+        }, 15000);
+      }
+    } catch (e) {}
   } catch (err) {
     lista.innerHTML = "<p style='color:red;'>Erro ao carregar FAQs.</p>";
   }
 }
+
+function pedirConfirmacaoGerarVideo(faq_id) {
+  window.faqIdAGerarVideo = faq_id;
+  const m = document.getElementById("modalConfirmGerarVideo");
+  if (m) m.style.display = "flex";
+}
+
+function showVideoBusyModal(message) {
+  const modal = document.getElementById("modalVideoBusy");
+  const msg = document.getElementById("modalVideoBusyMsg");
+  if (msg)
+    msg.textContent = message || "Não foi possível iniciar a geração do vídeo.";
+  if (modal) modal.style.display = "flex";
+}
+
+function hideVideoBusyModal() {
+  const modal = document.getElementById("modalVideoBusy");
+  if (modal) modal.style.display = "none";
+}
+
+async function confirmarGerarVideo() {
+  const faqId = window.faqIdAGerarVideo;
+  if (!faqId) return;
+  const confirmBtn = document.getElementById("confirmarGerarVideo");
+  if (confirmBtn) confirmBtn.disabled = true;
+  try {
+    const res = await fetch("/video/queue", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ faq_id: faqId }),
+    });
+    const out = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const msg = out.error || "Não foi possível gerar o vídeo.";
+      // Show a modal (instead of alert) for busy/duplicate cases.
+      showVideoBusyModal(msg);
+      return;
+    }
+    try {
+      localStorage.setItem("videoJobPolling", "1");
+    } catch (e) {}
+    if (typeof window.startVideoStatusPolling === "function") {
+      window.startVideoStatusPolling();
+    }
+    mostrarRespostas();
+  } catch (e) {
+    showVideoBusyModal("Erro ao comunicar com o servidor.");
+  } finally {
+    const m = document.getElementById("modalConfirmGerarVideo");
+    if (m) m.style.display = "none";
+    window.faqIdAGerarVideo = null;
+    if (confirmBtn) confirmBtn.disabled = false;
+  }
+}
+
+function cancelarGerarVideo() {
+  const m = document.getElementById("modalConfirmGerarVideo");
+  if (m) m.style.display = "none";
+  window.faqIdAGerarVideo = null;
+}
+
+// Wire busy modal close button (if present on this page)
+try {
+  const closeBusyBtn = document.getElementById("fecharModalVideoBusy");
+  if (closeBusyBtn) closeBusyBtn.addEventListener("click", hideVideoBusyModal);
+} catch (e) {}
 
 async function carregarTabelaFAQs(chatbotId, paraDropdown = false) {
   if (paraDropdown) {
@@ -288,14 +457,15 @@ function responderPergunta(pergunta) {
     return;
   }
 
-  const fonte = localStorage.getItem(`fonteSelecionada_bot${chatbotId}`) || "faq";
+  const fonte =
+    localStorage.getItem(`fonteSelecionada_bot${chatbotId}`) || "faq";
   fetch("/obter-resposta", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ pergunta, chatbot_id: chatbotId, fonte })
+    body: JSON.stringify({ pergunta, chatbot_id: chatbotId, fonte }),
   })
-    .then(res => res.json())
-    .then(data => {
+    .then((res) => res.json())
+    .then((data) => {
       if (data.success) {
         adicionarMensagem("bot", data.resposta);
         obterPerguntasSemelhantes(pergunta, chatbotId);
@@ -303,20 +473,24 @@ function responderPergunta(pergunta) {
       } else if (
         data.prompt_rag ||
         (data.erro &&
-          data.erro.toLowerCase().includes("deseja tentar encontrar uma resposta nos documentos pdf"))
+          data.erro
+            .toLowerCase()
+            .includes(
+              "deseja tentar encontrar uma resposta nos documentos pdf"
+            ))
       ) {
         window.awaitingRagConfirmation = true;
         mostrarPromptRAG(pergunta, chatbotId);
       } else {
-        adicionarMensagem("bot", data.erro || "❌ Nenhuma resposta encontrada.");
+        adicionarMensagem(
+          "bot",
+          data.erro || "❌ Nenhuma resposta encontrada."
+        );
         window.awaitingRagConfirmation = false;
       }
     })
     .catch(() => {
-      adicionarMensagem(
-        "bot",
-        "❌ Erro ao comunicar com o servidor."
-      );
+      adicionarMensagem("bot", "❌ Erro ao comunicar com o servidor.");
       window.awaitingRagConfirmation = false;
     });
 }
@@ -329,10 +503,10 @@ function obterPerguntasSemelhantes(perguntaOriginal, chatbotId) {
   fetch("/perguntas-semelhantes", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ pergunta: perguntaOriginal, chatbot_id: chatbotId })
+    body: JSON.stringify({ pergunta: perguntaOriginal, chatbot_id: chatbotId }),
   })
-    .then(res => res.json())
-    .then(data => {
+    .then((res) => res.json())
+    .then((data) => {
       if (data.success && data.sugestoes.length > 0) {
         const chat = document.getElementById("chatBody");
         const divTitulo = document.createElement("div");
@@ -346,7 +520,7 @@ function obterPerguntasSemelhantes(perguntaOriginal, chatbotId) {
         btnContainer.style.marginTop = "6px";
         btnContainer.style.flexWrap = "wrap";
 
-        data.sugestoes.forEach(pergunta => {
+        data.sugestoes.forEach((pergunta) => {
           const btn = document.createElement("button");
           btn.className = "btn-similar";
           btn.textContent = pergunta;
@@ -363,27 +537,93 @@ function obterPerguntasSemelhantes(perguntaOriginal, chatbotId) {
     });
 }
 
-document.querySelectorAll(".faqForm").forEach(faqForm => {
+document.querySelectorAll(".faqForm").forEach((faqForm) => {
+  // Remove any existing handlers to prevent duplicate submissions
+  const newForm = faqForm.cloneNode(true);
+  faqForm.parentNode.replaceChild(newForm, faqForm);
+  const form = newForm;
+
+  // Evitar tratar formulários de admin que já têm handlers dedicados
+  const formId = form.id || "";
+  if (
+    formId === "formAdicionarFAQ" ||
+    formId.startsWith("faqForm-") ||
+    form.closest(".modal-box-adicionar-faq-exclusivo")
+  ) {
+    return;
+  }
+
   const statusDiv = document.createElement("div");
   statusDiv.className = "faqStatus";
   statusDiv.style.marginTop = "10px";
-  faqForm.appendChild(statusDiv);
+  form.appendChild(statusDiv);
 
-  faqForm.addEventListener("submit", async (e) => {
+  // Prevent duplicate submissions
+  let isSubmitting = false;
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevent other handlers from firing
+
+    if (isSubmitting) {
+      return; // Already submitting, ignore
+    }
+    isSubmitting = true;
 
     const form = e.target;
-    const chatbotIdRaw = form.querySelector('select[name="chatbot_id"]').value;
+    const chatbotIdEl =
+      form.querySelector('select[name="chatbot_id"]') ||
+      form.querySelector('[name="chatbot_id"]');
+    const chatbotIdRaw = chatbotIdEl ? chatbotIdEl.value : "";
 
     const dadosBase = {
-      categoria_id: parseInt(form.categoria_id.value) || null,
-      designacao: form.designacao.value.trim(),
-      pergunta: form.pergunta.value.trim(),
-      resposta: form.resposta.value.trim(),
-      documentos: form.documentos.value.trim(),
-      relacionadas: form.relacionadas.value.trim(),
-      recomendado: form.recomendado ? form.recomendado.checked : false
+      categoria_id: (() => {
+        const el = form.querySelector('[name="categoria_id"]');
+        return el ? parseInt(el.value) || null : null;
+      })(),
+      serve_text: (() => {
+        const el = form.querySelector('[name="serve_text"]');
+        return el ? el.value.trim() : "";
+      })(),
+      designacao: (() => {
+        const el = form.querySelector('[name="designacao"]');
+        return el ? el.value.trim() : "";
+      })(),
+      identificador: (() => {
+        const el = form.querySelector('[name="identificador"]');
+        return el ? el.value.trim() : "";
+      })(),
+      pergunta: (() => {
+        const el = form.querySelector('[name="pergunta"]');
+        return el ? el.value.trim() : "";
+      })(),
+      resposta: (() => {
+        const el = form.querySelector('[name="resposta"]');
+        return el ? el.value.trim() : "";
+      })(),
+      documentos: (() => {
+        const el = form.querySelector('[name="documentos"]');
+        return el ? el.value.trim() : "";
+      })(),
+      relacionadas: (() => {
+        const el = form.querySelector('[name="relacionadas"]');
+        return el ? el.value.trim() : "";
+      })(),
+      recomendado: (() => {
+        const el = form.querySelector('[name="recomendado"]');
+        return el ? el.checked : false;
+      })(),
+      idioma: (() => {
+        const el = form.querySelector('[name="idioma"]');
+        return el ? el.value.trim() || "pt" : "pt";
+      })(),
     };
+
+    if (!chatbotIdRaw) {
+      statusDiv.innerHTML = "❌ Chatbot não selecionado.";
+      statusDiv.style.color = "red";
+      return;
+    }
 
     try {
       if (chatbotIdRaw === "todos") {
@@ -395,7 +635,7 @@ document.querySelectorAll(".faqForm").forEach(faqForm => {
           await fetch("/faqs", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
           });
         }
 
@@ -405,10 +645,11 @@ document.querySelectorAll(".faqForm").forEach(faqForm => {
         mostrarRespostas();
       } else {
         const data = { chatbot_id: parseInt(chatbotIdRaw), ...dadosBase };
+
         const res = await fetch("/faqs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
+          body: JSON.stringify(data),
         });
 
         const resultado = await res.json();
@@ -420,7 +661,9 @@ document.querySelectorAll(".faqForm").forEach(faqForm => {
           carregarTabelaFAQs(parseInt(chatbotIdRaw), true);
           mostrarRespostas();
         } else {
-          statusDiv.innerHTML = `❌ Erro: ${resultado.error || resultado.erro || "Erro desconhecido."}`;
+          statusDiv.innerHTML = `❌ Erro: ${
+            resultado.error || resultado.erro || "Erro desconhecido."
+          }`;
           statusDiv.style.color = "red";
         }
       }
@@ -428,21 +671,25 @@ document.querySelectorAll(".faqForm").forEach(faqForm => {
       statusDiv.innerHTML = "❌ Erro de comunicação com o servidor.";
       statusDiv.style.color = "red";
       console.error(err);
+    } finally {
+      isSubmitting = false;
     }
   });
 });
 
-document.querySelectorAll(".uploadForm").forEach(uploadForm => {
+document.querySelectorAll(".uploadForm").forEach((uploadForm) => {
   uploadForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const uploadStatus = 
+    const uploadStatus =
       uploadForm.querySelector(".uploadStatusPDF") ||
       uploadForm.querySelector(".uploadStatus") ||
       document.getElementById("uploadStatus");
 
     if (!uploadStatus) {
-      alert("⚠️ Erro: Não foi encontrado nenhum elemento para mostrar o status do upload!");
+      alert(
+        "⚠️ Erro: Não foi encontrado nenhum elemento para mostrar o status do upload!"
+      );
       return;
     }
 
@@ -450,21 +697,33 @@ document.querySelectorAll(".uploadForm").forEach(uploadForm => {
     let rota = "upload-faq-docx";
     let isPDF = false;
 
-    const pdfInput = uploadForm.querySelector('input[type="file"][accept=".pdf"]');
-    const docxInput = uploadForm.querySelector('input[type="file"][accept=".docx"]');
+    const pdfInput = uploadForm.querySelector(
+      'input[type="file"][accept=".pdf"]'
+    );
+    const docxInput = uploadForm.querySelector(
+      'input[type="file"][accept*=".docx"], input[type="file"][accept*=".odt"]'
+    );
 
     if (pdfInput && pdfInput.files.length > 0) {
       rota = "upload-pdf";
       isPDF = true;
       formData.delete("file");
-      Array.from(pdfInput.files).forEach(file => formData.append("file", file));
-    } else if (docxInput && docxInput.files.length > 1) {
+      Array.from(pdfInput.files).forEach((file) =>
+        formData.append("file", file)
+      );
+    } else if (docxInput && docxInput.files.length > 0) {
+      // Always use the multi endpoint for docx uploads (works for 1+ files and avoids file/files mismatches)
       rota = "upload-faq-docx-multiplos";
       formData.delete("files");
-      Array.from(docxInput.files).forEach(file => formData.append("files", file));
+      formData.delete("file");
+      Array.from(docxInput.files).forEach((file) =>
+        formData.append("files", file)
+      );
     }
 
-    const chatbotId = uploadForm.querySelector('input[name="chatbot_id"]')?.value;
+    const chatbotId = uploadForm.querySelector(
+      'input[name="chatbot_id"]'
+    )?.value;
     if (!chatbotId) {
       uploadStatus.innerHTML = "❌ Selecione um chatbot antes de enviar.";
       uploadStatus.style.color = "red";
@@ -475,7 +734,7 @@ document.querySelectorAll(".uploadForm").forEach(uploadForm => {
     try {
       const res = await fetch(`/${rota}`, {
         method: "POST",
-        body: formData
+        body: formData,
       });
       const resultado = await res.json();
 
@@ -488,7 +747,9 @@ document.querySelectorAll(".uploadForm").forEach(uploadForm => {
           carregarTabelaFAQs(parseInt(chatbotId), true);
         }
       } else {
-        uploadStatus.innerHTML = `❌ Erro: ${resultado.error || "Erro ao carregar o documento."}`;
+        uploadStatus.innerHTML = `❌ Erro: ${
+          resultado.error || "Erro ao carregar o documento."
+        }`;
         uploadStatus.style.color = "red";
       }
     } catch (err) {
@@ -504,59 +765,140 @@ let categoriasDisponiveis = [];
 
 async function editarFAQ(faq_id) {
   try {
-    const faqResp = await fetch(`/faqs/${faq_id}`).then(r => r.json());
+    const faqResp = await fetch(`/faqs/${faq_id}`).then((r) => r.json());
     if (!faqResp.success || !faqResp.faq) {
       alert("Erro ao carregar dados da FAQ.");
       return;
     }
     faqAEditar = faqResp.faq;
 
-    const categorias = await fetch(`/chatbots/${faqAEditar.chatbot_id}/categorias`).then(r => r.json());
+    // Block editing if the FAQ video is being generated
+    if (
+      faqAEditar.video_status === "queued" ||
+      faqAEditar.video_status === "processing"
+    ) {
+      alert(
+        "Não é possível editar esta FAQ enquanto o vídeo desta FAQ está a ser gerado."
+      );
+      return;
+    }
+
+    // Block editing FAQs that already have video when any other video job is running
+    try {
+      const vs = await fetch("/video/status").then((r) => r.json());
+      const job = (vs && vs.job) || {};
+      const isActive = job.status === "queued" || job.status === "processing";
+      if (isActive && faqAEditar.video_status === "ready") {
+        alert(
+          "Não é possível editar FAQs com vídeo já gerado enquanto existe outro vídeo a ser gerado."
+        );
+        return;
+      }
+    } catch (e) {}
+
+    const categorias = await fetch(
+      `/chatbots/${faqAEditar.chatbot_id}/categorias`
+    ).then((r) => r.json());
     categoriasDisponiveis = categorias;
 
-    document.getElementById('editarPergunta').value = faqAEditar.pergunta || "";
-    document.getElementById('editarResposta').value = faqAEditar.resposta || "";
-    document.getElementById('editarIdioma').value = faqAEditar.idioma || "pt";
-    if (document.getElementById('editarRecomendado'))
-      document.getElementById('editarRecomendado').checked = !!faqAEditar.recomendado;
-
-    const catContainer = document.getElementById('editarCategoriasContainer');
-    let categoriasMarcadas = [];
-    if (Array.isArray(faqAEditar.categorias)) {
-      categoriasMarcadas = faqAEditar.categorias.map(Number);
-    } else if (faqAEditar.categoria_id) {
-      categoriasMarcadas = [Number(faqAEditar.categoria_id)];
+    document.getElementById("editarPergunta").value = faqAEditar.pergunta || "";
+    const editarServe = document.getElementById("editarServeText");
+    if (editarServe) {
+      editarServe.value = faqAEditar.serve_text || "";
     }
-    catContainer.innerHTML = categorias.map(cat => {
-      const checked = categoriasMarcadas.includes(Number(cat.categoria_id));
-      return `<label style="display:inline-flex;align-items:center;gap:3px;">
-        <input type="checkbox" value="${cat.categoria_id}" ${checked ? "checked" : ""} />${cat.nome}
-      </label>`;
-    }).join("");
+    document.getElementById("editarResposta").value = faqAEditar.resposta || "";
+    const editarIdentificador = document.getElementById("editarIdentificador");
+    if (editarIdentificador) {
+      editarIdentificador.value = faqAEditar.identificador || "";
+    }
+    document.getElementById("editarIdioma").value = faqAEditar.idioma || "pt";
+    if (document.getElementById("editarRecomendado"))
+      document.getElementById("editarRecomendado").checked =
+        !!faqAEditar.recomendado;
+    // Preencher FAQs relacionadas
+    await carregarFAQsRelacionadasEditar(
+      faqAEditar.chatbot_id,
+      faqAEditar.relacionadas || [],
+      faqAEditar.faq_id
+    );
+
+    const catSelect = document.getElementById("editarCategoriaSelect");
+    if (catSelect) {
+      const selectedId = faqAEditar.categoria_id
+        ? String(faqAEditar.categoria_id)
+        : "";
+      catSelect.innerHTML =
+        '<option value="">Sem categoria</option>' +
+        categorias
+          .map(
+            (cat) => `<option value="${cat.categoria_id}">${cat.nome}</option>`
+          )
+          .join("");
+      catSelect.value = selectedId;
+    }
 
     document.getElementById("modalEditarFAQ").style.display = "flex";
-    document.getElementById("editarStatusFAQ").textContent = "";
+    const statusDiv = document.getElementById("editarStatusFAQ");
+    if (statusDiv) {
+      let texto = "";
+      if (
+        faqAEditar.video_status === "processing" ||
+        faqAEditar.video_status === "queued"
+      ) {
+        texto = "Vídeo desta FAQ está em processamento.";
+        statusDiv.style.color = "#d97706";
+      } else if (faqAEditar.video_status === "ready" && faqAEditar.video_path) {
+        texto = `Vídeo disponível para esta FAQ. Clique em 'Ver vídeo' na listagem para o abrir.`;
+        statusDiv.style.color = "#16a34a";
+      } else if (faqAEditar.video_status === "failed") {
+        texto = "A geração de vídeo para esta FAQ falhou.";
+        statusDiv.style.color = "#b91c1c";
+      } else {
+        texto = "Esta FAQ ainda não tem vídeo associado.";
+        statusDiv.style.color = "#4b5563";
+      }
+      statusDiv.textContent = texto;
+    }
   } catch (err) {
     alert("Erro ao carregar dados da FAQ.");
   }
-}  
+}
 
 const formEditarFAQ = document.getElementById("formEditarFAQ");
 if (formEditarFAQ) {
-  formEditarFAQ.onsubmit = async function(e) {
+  formEditarFAQ.onsubmit = async function (e) {
     e.preventDefault();
     const status = document.getElementById("editarStatusFAQ");
     status.textContent = "";
 
     if (!faqAEditar) return;
 
-    const pergunta = document.getElementById('editarPergunta').value.trim();
-    const resposta = document.getElementById('editarResposta').value.trim();
-    const idioma = document.getElementById('editarIdioma').value;
-    const recomendado = document.getElementById('editarRecomendado') ? document.getElementById('editarRecomendado').checked : false;
+    const hadReadyVideo =
+      faqAEditar.video_status === "ready" && !!faqAEditar.video_path;
+    let shouldRegenerateVideo = false;
+    if (hadReadyVideo) {
+      shouldRegenerateVideo = window.confirm(
+        "Esta FAQ já tem vídeo gerado. Deseja regenerar o vídeo após atualizar?"
+      );
+    }
 
-    const categoriasSel = Array.from(document.querySelectorAll('#editarCategoriasContainer input[type="checkbox"]:checked'))
-      .map(cb => parseInt(cb.value));
+    const pergunta = document.getElementById("editarPergunta").value.trim();
+    const serve_text = document.getElementById("editarServeText")?.value.trim();
+    const resposta = document.getElementById("editarResposta").value.trim();
+    const idioma = document.getElementById("editarIdioma").value;
+    const identificador = document
+      .getElementById("editarIdentificador")
+      ?.value.trim();
+    const recomendado = document.getElementById("editarRecomendado")
+      ? document.getElementById("editarRecomendado").checked
+      : false;
+
+    const categoriaSel = document.getElementById("editarCategoriaSelect")
+      ? parseInt(document.getElementById("editarCategoriaSelect").value || "")
+      : null;
+    const relacionadasSel = Array.from(
+      document.querySelectorAll("#editarFaqRelacionadasSelect option:checked")
+    ).map((opt) => parseInt(opt.value));
 
     try {
       const res = await fetch(`/faqs/${faqAEditar.faq_id}`, {
@@ -564,21 +906,54 @@ if (formEditarFAQ) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           pergunta,
+          serve_text,
           resposta,
           idioma,
+          identificador,
           recomendado,
-          categorias: categoriasSel
-        })
+          categoria_id: Number.isFinite(categoriaSel) ? categoriaSel : null,
+          relacionadas: relacionadasSel,
+        }),
       });
       const out = await res.json();
       if (out.success) {
-        status.textContent = "✅ FAQ atualizada com sucesso!";
-        status.style.color = "green";
+        if (shouldRegenerateVideo) {
+          try {
+            const q = await fetch("/video/queue", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ faq_id: faqAEditar.faq_id, force: true }),
+            });
+            const qout = await q.json();
+            if (qout && qout.success) {
+              status.textContent =
+                "✅ FAQ atualizada. Vídeo colocado na fila para regeneração.";
+              status.style.color = "green";
+            } else {
+              status.textContent =
+                (qout && qout.error) ||
+                "FAQ atualizada, mas não foi possível regenerar o vídeo.";
+              status.style.color = "#b91c1c";
+            }
+          } catch (e) {
+            status.textContent =
+              "FAQ atualizada, mas houve erro ao pedir regeneração do vídeo.";
+            status.style.color = "#b91c1c";
+          }
+        } else {
+          status.textContent = "✅ FAQ atualizada com sucesso!";
+          status.style.color = "green";
+        }
         setTimeout(() => {
           document.getElementById("modalEditarFAQ").style.display = "none";
           mostrarRespostas();
         }, 800);
       } else {
+        if (res.status === 409 && out && out.busy) {
+          status.textContent = out.error || "Não é possível editar agora.";
+          status.style.color = "#b91c1c";
+          return;
+        }
         status.textContent = out.error || "Erro ao atualizar.";
         status.style.color = "red";
       }
@@ -589,15 +964,103 @@ if (formEditarFAQ) {
   };
 }
 
+// Ligar handlers do modal de gerar vídeo (se existir nesta página)
+try {
+  const btnOk = document.getElementById("confirmarGerarVideo");
+  const btnCancel = document.getElementById("cancelarGerarVideo");
+  if (btnOk) btnOk.onclick = confirmarGerarVideo;
+  if (btnCancel) btnCancel.onclick = cancelarGerarVideo;
+} catch (e) {}
+
 function ligarBotaoCancelarEditarFAQ() {
   const btnCancelar = document.getElementById("btnCancelarFAQ");
   if (btnCancelar) {
-    btnCancelar.onclick = function(e) {
+    btnCancelar.onclick = function (e) {
       e.preventDefault();
       document.getElementById("modalEditarFAQ").style.display = "none";
       const status = document.getElementById("editarStatusFAQ");
       if (status) status.textContent = "";
+      const relSelect = document.getElementById("editarFaqRelacionadasSelect");
+      if (relSelect && typeof $ !== "undefined" && $(relSelect).length) {
+        try {
+          $(relSelect).val(null).trigger("change").select2("close");
+        } catch (err) {}
+      }
+    };
+  }
+}
+
+async function carregarFAQsRelacionadasEditar(
+  chatbotId,
+  selecionadas = [],
+  faqAtualId = null
+) {
+  const select = document.getElementById("editarFaqRelacionadasSelect");
+  if (!select || !chatbotId) return;
+
+  try {
+    const response = await fetch(`/faqs/chatbot/${chatbotId}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const faqs = await response.json();
+
+    let wasInitialized = false;
+    if (typeof $ !== "undefined" && $(select).length) {
+      const $select = $(select);
+      if ($select.hasClass("select2-hidden-accessible")) {
+        wasInitialized = true;
+        $select.select2("destroy");
+      }
     }
+
+    select.innerHTML = "";
+    const filtered = Array.isArray(faqs)
+      ? faqs.filter((f) => String(f.faq_id) !== String(faqAtualId))
+      : [];
+
+    if (!filtered.length) {
+      const opt = document.createElement("option");
+      opt.value = "";
+      opt.textContent = "Nenhuma FAQ disponível";
+      opt.disabled = true;
+      select.appendChild(opt);
+    } else {
+      filtered.forEach((faq) => {
+        const opt = document.createElement("option");
+        opt.value = faq.faq_id;
+        const pergunta = faq.pergunta || `FAQ ${faq.faq_id}`;
+        const truncated =
+          pergunta.length > 60 ? pergunta.slice(0, 60) + "..." : pergunta;
+        const label = (faq.identificador || "").trim();
+        opt.textContent = label || truncated;
+        opt.title = label ? `${label} — ${pergunta}` : pergunta;
+        if (
+          selecionadas.includes(faq.faq_id) ||
+          selecionadas.includes(+faq.faq_id)
+        ) {
+          opt.selected = true;
+        }
+        select.appendChild(opt);
+      });
+    }
+
+    if (typeof $ !== "undefined" && $(select).length) {
+      try {
+        const $modal = $("#modalEditarFAQ");
+        $(select).select2({
+          placeholder: "Escolha FAQs relacionadas",
+          width: "100%",
+          allowClear: true,
+          dropdownParent: $modal.length ? $modal : $("body"),
+          language: {
+            noResults: () => "Nenhum resultado encontrado",
+          },
+        });
+      } catch (err) {
+        console.error("Erro ao iniciar select2 no editar FAQ:", err);
+      }
+    }
+  } catch (err) {
+    console.error("Erro ao carregar FAQs relacionadas (editar):", err);
   }
 }
 
@@ -627,9 +1090,20 @@ document.addEventListener("DOMContentLoaded", () => {
   const filtroChatbot = document.getElementById("filtroChatbot");
   const filtroIdioma = document.getElementById("filtroIdioma");
 
-  if (pesquisaInput) pesquisaInput.addEventListener("input", carregarTabelaFAQsBackoffice);
-  if (filtroChatbot) filtroChatbot.addEventListener("change", carregarTabelaFAQsBackoffice);
-  if (filtroIdioma) filtroIdioma.addEventListener("change", carregarTabelaFAQsBackoffice);
+  if (pesquisaInput)
+    pesquisaInput.addEventListener("input", carregarTabelaFAQsBackoffice);
+  if (filtroChatbot)
+    filtroChatbot.addEventListener("change", carregarTabelaFAQsBackoffice);
+  if (filtroIdioma)
+    filtroIdioma.addEventListener("change", carregarTabelaFAQsBackoffice);
 
   ligarBotaoCancelarEditarFAQ();
+
+  // Polling para atualizar status dos vídeos a cada 30 segundos
+  setInterval(() => {
+    // Só recarrega se a página estiver visível e se houver vídeos em processamento
+    if (document.visibilityState === "visible") {
+      carregarTabelaFAQsBackoffice();
+    }
+  }, 30000);
 });

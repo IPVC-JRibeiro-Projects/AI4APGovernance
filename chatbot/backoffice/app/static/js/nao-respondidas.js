@@ -1,4 +1,6 @@
 window.chatbotsMapNaoResp = {};
+let perguntasNaoRespondidasCache = [];
+let perguntaSelecionada = null;
 
 async function carregarChatbotsNaoRespondidas() {
   try {
@@ -22,11 +24,13 @@ async function carregarChatbotsNaoRespondidas() {
       window.chatbotsMapNaoResp[bot.chatbot_id] = bot.nome;
     });
   } catch (err) {
-    console.error("Erro ao carregar chatbots (nao respondidas):", err);
+    console.error("❌ Erro ao carregar chatbots (não respondidas):", err);
   }
 }
 
-
+/**
+ * Formata uma data ISO (string) para dd/mm/yyyy hh:mm.
+ */
 function formatarDataHoraISO(isoString) {
   if (!isoString) return "-";
   try {
@@ -45,20 +49,24 @@ function formatarDataHoraISO(isoString) {
   }
 }
 
-
+/**
+ * Carrega as perguntas não respondidas do backend
+ * e renderiza a tabela com filtros (chatbot, estado, pesquisa).
+ */
 async function carregarTabelaNaoRespondidas() {
   const lista = document.getElementById("listaNaoRespondidas");
   const titulo = document.getElementById("tituloNaoRespondidas");
 
   if (!lista) return;
 
-  lista.innerHTML = "<p>A carregar perguntas nao respondidas...</p>";
+  lista.innerHTML = "<p>A carregar perguntas não respondidas...</p>";
   if (titulo) titulo.textContent = "";
 
-  const textoPesquisa =
-    (document.getElementById("pesquisaNaoRespondida")?.value || "")
-      .toLowerCase()
-      .trim();
+  const textoPesquisa = (
+    document.getElementById("pesquisaNaoRespondida")?.value || ""
+  )
+    .toLowerCase()
+    .trim();
   const filtroChatbot =
     document.getElementById("filtroChatbotNaoResp")?.value || "";
   const filtroEstado =
@@ -68,14 +76,16 @@ async function carregarTabelaNaoRespondidas() {
     const res = await fetch("/perguntas-nao-respondidas");
     const json = await res.json();
 
+    // Se o backend devolver {success: false, erro: "..."}
     if (!Array.isArray(json)) {
       lista.innerHTML =
-        "<p style='color:red;'>Erro ao carregar perguntas nao respondidas.</p>";
+        "<p style='color:red;'>Erro ao carregar perguntas não respondidas.</p>";
       console.error("Resposta inesperada de /nao-respondidas:", json);
       return;
     }
 
     let perguntas = json;
+    perguntasNaoRespondidasCache = perguntas;
 
     let filtradas = perguntas.filter((p) => {
       let okPesquisa = true;
@@ -100,7 +110,7 @@ async function carregarTabelaNaoRespondidas() {
 
     if (filtradas.length === 0) {
       lista.innerHTML =
-        "<p>Nao existem perguntas nao respondidas para os filtros selecionados.</p>";
+        "<p>Não existem perguntas não respondidas para os filtros selecionados.</p>";
       if (titulo) titulo.textContent = "0 perguntas encontradas.";
       return;
     }
@@ -126,7 +136,7 @@ async function carregarTabelaNaoRespondidas() {
             <th>Fonte</th>
             <th>Estado</th>
             <th>Criada em</th>
-            <th>Acoes</th>
+            <th>Ações</th>
           </tr>
         </thead>
         <tbody>
@@ -136,21 +146,16 @@ async function carregarTabelaNaoRespondidas() {
               const fonte = p.fonte || "-";
               const score =
                 typeof p.max_score === "number" ? p.max_score.toFixed(2) : "-";
-              const estadoValor = (p.estado || "pendente").toLowerCase();
-              const opcoesEstado = ["pendente", "tratada", "ignorada"]
-                .map(
-                  (estado) =>
-                    `<option value="${estado}" ${
-                      estado === estadoValor ? "selected" : ""
-                    }>${estado.charAt(0).toUpperCase() + estado.slice(1)}</option>`
-                )
-                .join("");
-              const selectEstado = `
-                <div class="estado-select-wrapper estado-${estadoValor}">
-                  <select class="estado-dropdown" onchange="alterarEstado(${p.id}, this.value, this)">
-                    ${opcoesEstado}
-                  </select>
-                </div>`;
+              const estado = (p.estado || "pendente").toLowerCase();
+              let estadoLabel = estado;
+
+              if (estado === "pendente") {
+                estadoLabel = '<span style="color:#cc8c00;">Pendente</span>';
+              } else if (estado === "tratada") {
+                estadoLabel = '<span style="color:green;">Tratada</span>';
+              } else if (estado === "ignorada") {
+                estadoLabel = '<span style="color:#999;">Ignorada</span>';
+              }
 
               const criadoEm = formatarDataHoraISO(p.criado_em);
 
@@ -159,10 +164,15 @@ async function carregarTabelaNaoRespondidas() {
                 <td>${nomeBot}</td>
                 <td>${p.pergunta || "-"}</td>
                 <td>${fonte}</td>
-                <td style="text-align:center;">${selectEstado}</td>
+                <td style="text-align:center;">${estadoLabel}</td>
                 <td>${criadoEm || "-"}</td>
                 <td>
-                  <button class="btn-remover" onclick="removerPergunta(${p.id})">Remover</button>
+                  <button class="btn-remover" onclick="removerPergunta(${
+                    p.id
+                  })">Remover</button>
+                  <button class="btn-editar" onclick="abrirModalTratarPergunta(${
+                    p.id
+                  })">Editar</button>
                 </td>
               </tr>
             `;
@@ -172,46 +182,63 @@ async function carregarTabelaNaoRespondidas() {
       </table>
     `;
   } catch (err) {
-    console.error("Erro ao carregar perguntas nao respondidas:", err);
+    console.error(" Erro ao carregar perguntas não respondidas:", err);
     lista.innerHTML =
-      "<p style='color:red;'>Erro ao carregar perguntas nao respondidas.</p>";
+      "<p style='color:red;'>Erro ao carregar perguntas não respondidas.</p>";
   }
 }
 
-function aplicarClasseEstado(selectElement, estado) {
-  if (!selectElement) return;
-  const wrapper = selectElement.closest(".estado-select-wrapper");
-  if (!wrapper) return;
-  wrapper.classList.remove("estado-pendente", "estado-tratada", "estado-ignorada");
-  wrapper.classList.add(`estado-${estado}`);
-}
+function abrirModalTratarPergunta(perguntaId) {
+  const modal = document.getElementById("modalTratarPergunta");
+  const textoEl = document.getElementById("perguntaSelecionadaTexto");
+  const selectAcao = document.getElementById("acaoPergunta");
 
-async function alterarEstado(perguntaId, novoEstado, selectElement) {
-  const estadosPermitidos = ["pendente", "tratada", "ignorada"];
-  const estadoNormalizado = (novoEstado || "").trim().toLowerCase();
+  if (!modal || !textoEl || !selectAcao) return;
 
-  if (!estadosPermitidos.includes(estadoNormalizado)) {
-    alert("Estado invalido. Use pendente, tratada ou ignorada.");
-    carregarTabelaNaoRespondidas();
+  perguntaSelecionada = perguntasNaoRespondidasCache.find(
+    (p) => String(p.id) === String(perguntaId)
+  );
+
+  if (!perguntaSelecionada) {
+    console.error("Pergunta não encontrada no cache", perguntaId);
     return;
   }
 
-  const res = await fetch(`/perguntas-nao-respondidas/${perguntaId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      estado: estadoNormalizado,
-    }),
-  });
-  const json = await res.json();
-  if (json.success) {
-    aplicarClasseEstado(selectElement, estadoNormalizado);
-    carregarTabelaNaoRespondidas();
-  } else {
-    alert("Nao foi possivel atualizar o estado. Tente novamente.");
-    carregarTabelaNaoRespondidas();
+  textoEl.textContent = perguntaSelecionada.pergunta || "";
+  selectAcao.value = "criar_faq";
+  modal.style.display = "flex";
+}
+
+async function confirmarTratarPergunta() {
+  const modal = document.getElementById("modalTratarPergunta");
+  const selectAcao = document.getElementById("acaoPergunta");
+  if (!perguntaSelecionada || !selectAcao) return;
+
+  const acao = selectAcao.value;
+
+  if (acao === "marcar_tratada" || acao === "marcar_ignorada") {
+    const novoEstado = acao === "marcar_tratada" ? "tratada" : "ignorada";
+    const res = await fetch(
+      `/perguntas-nao-respondidas/${perguntaSelecionada.id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estado: novoEstado }),
+      }
+    );
+    const json = await res.json();
+    if (json.success) {
+      if (modal) modal.style.display = "none";
+      perguntaSelecionada = null;
+      carregarTabelaNaoRespondidas();
+    }
+  } else if (acao === "criar_faq") {
+    // Guardar a pergunta para futura criação de FAQ na página de respostas
+    localStorage.setItem(
+      "perguntaParaNovaFAQ",
+      perguntaSelecionada.pergunta || ""
+    );
+    window.location.href = "/respostas";
   }
 }
 
@@ -243,4 +270,15 @@ document.addEventListener("DOMContentLoaded", () => {
     filtroChatbot.addEventListener("change", carregarTabelaNaoRespondidas);
   if (filtroEstado)
     filtroEstado.addEventListener("change", carregarTabelaNaoRespondidas);
+
+  const btnConfirmar = document.getElementById("confirmarTratarPergunta");
+  const btnCancelar = document.getElementById("cancelarTratarPergunta");
+  const modal = document.getElementById("modalTratarPergunta");
+
+  if (btnConfirmar) btnConfirmar.onclick = confirmarTratarPergunta;
+  if (btnCancelar && modal)
+    btnCancelar.onclick = function () {
+      modal.style.display = "none";
+      perguntaSelecionada = null;
+    };
 });

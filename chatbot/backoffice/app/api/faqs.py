@@ -1,6 +1,10 @@
 from flask import Blueprint, request, jsonify
 from ..db import get_conn
 from ..services.retreival import build_faiss_index
+from ..services.video_service import get_video_job_status
+import os
+from pathlib import Path
+from ..services.video_service import ROOT, RESULTS_DIR
 
 app = Blueprint('faqs', __name__)
 
@@ -10,10 +14,21 @@ def get_faqs():
     conn = get_conn()
     cur = conn.cursor()
     try:
-        cur.execute("SELECT faq_id, chatbot_id, designacao, pergunta, resposta FROM FAQ")
+        cur.execute("SELECT faq_id, chatbot_id, identificador, designacao, pergunta, serve_text, resposta, video_status, video_path FROM faq")
         data = cur.fetchall()
         return jsonify([
-            {"faq_id": f[0], "chatbot_id": f[1], "designacao": f[2], "pergunta": f[3], "resposta": f[4]} for f in data
+            {
+                "faq_id": f[0],
+                "chatbot_id": f[1],
+                "identificador": f[2],
+                "designacao": f[3],
+                "pergunta": f[4],
+                "serve_text": f[5],
+                "resposta": f[6],
+                "video_status": f[7],
+                "video_path": f[8],
+            }
+            for f in data
         ])
     except Exception as e:
         conn.rollback()
@@ -28,10 +43,29 @@ def get_faq_by_id(faq_id):
     cur = conn.cursor()
     try:
         cur.execute("""
-            SELECT f.faq_id, f.chatbot_id, f.categoria_id, f.designacao, f.pergunta, f.resposta, f.idioma, f.links_documentos,
-                   c.nome as categoria_nome, f.recomendado
-            FROM FAQ f
-            LEFT JOIN Categoria c ON f.categoria_id = c.categoria_id
+            SELECT f.faq_id,
+                   f.chatbot_id,
+                   f.categoria_id,
+                   f.designacao,
+                   f.pergunta,
+                     f.serve_text,
+                   f.resposta,
+                   f.idioma,
+                   f.links_documentos,
+                   c.nome as categoria_nome,
+                   f.recomendado,
+                   f.video_status,
+                   f.video_path,
+                   f.video_text,
+                   f.identificador,
+                   COALESCE(rel.relacionadas, ARRAY[]::int[]) AS relacionadas
+            FROM faq f
+            LEFT JOIN categoria c ON f.categoria_id = c.categoria_id
+            LEFT JOIN (
+                SELECT faq_id, array_agg(faq_relacionada_id) FILTER (WHERE faq_relacionada_id IS NOT NULL) AS relacionadas
+                FROM faq_relacionadas
+                GROUP BY faq_id
+            ) rel ON rel.faq_id = f.faq_id
             WHERE f.faq_id = %s
         """, (faq_id,))
         faq = cur.fetchone()
@@ -45,11 +79,17 @@ def get_faq_by_id(faq_id):
                 "categoria_id": faq[2],
                 "designacao": faq[3],
                 "pergunta": faq[4],
-                "resposta": faq[5],
-                "idioma": faq[6],
-                "links_documentos": faq[7],
-                "categoria_nome": faq[8],
-                "recomendado": faq[9]
+                "serve_text": faq[5],
+                "resposta": faq[6],
+                "idioma": faq[7],
+                "links_documentos": faq[8],
+                "categoria_nome": faq[9],
+                "recomendado": faq[10],
+                "video_status": faq[11],
+                "video_path": faq[12],
+                "video_text": faq[13],
+                "identificador": faq[14],
+                "relacionadas": faq[15] or [],
             }
         })
     except Exception as e:
@@ -65,9 +105,9 @@ def get_faqs_por_chatbot(chatbot_id):
     cur = conn.cursor()
     try:
         cur.execute("""
-            SELECT f.faq_id, c.nome, f.pergunta, f.resposta
-            FROM FAQ f
-            LEFT JOIN Categoria c ON f.categoria_id = c.categoria_id
+            SELECT f.faq_id, c.nome, f.pergunta, f.resposta, f.identificador
+            FROM faq f
+            LEFT JOIN categoria c ON f.categoria_id = c.categoria_id
             WHERE f.chatbot_id = %s
         """, (chatbot_id,))
         data = cur.fetchall()
@@ -76,7 +116,8 @@ def get_faqs_por_chatbot(chatbot_id):
                 "faq_id": row[0],
                 "categoria": row[1],
                 "pergunta": row[2],
-                "resposta": row[3]
+                "resposta": row[3],
+                "identificador": row[4],
             }
             for row in data
         ])
@@ -94,17 +135,162 @@ def update_faq(faq_id):
     data = request.get_json()
     try:
         pergunta = data.get("pergunta", "").strip()
+        serve_text = (data.get("serve_text") or "").strip() or None
         resposta = data.get("resposta", "").strip()
         idioma = data.get("idioma", "pt").strip()
         categorias = data.get("categorias", [])
         recomendado = data.get("recomendado", False)
-        categoria_id = categorias[0] if categorias else None
-        cur.execute("""
-            UPDATE FAQ SET pergunta=%s, resposta=%s, idioma=%s, categoria_id=%s, recomendado=%s
-            WHERE faq_id=%s
-        """, (pergunta, resposta, idioma, categoria_id, recomendado, faq_id))
-        conn.commit()
-        build_faiss_index()
+        # Accept either categoria_id (single select) or categorias[] (legacy multi)
+        if "categoria_id" in data:
+            raw_cat = data.get("categoria_id")
+            try:
+                categoria_id = int(raw_cat) if raw_cat is not None and str(raw_cat).strip() != "" else None
+            except Exception:
+                categoria_id = None
+        else:
+            categoria_id = categorias[0] if categorias else None
+        identificador = (data.get("identificador") or "").strip()
+        relacionadas_raw = data.get("relacionadas", None)
+        relacionadas_ids = []
+        if relacionadas_raw is not None:
+            if isinstance(relacionadas_raw, list):
+                relacionadas_ids = [int(x) for x in relacionadas_raw if str(x).strip().isdigit()]
+            else:
+                relacionadas_ids = [
+                    int(x.strip()) for x in str(relacionadas_raw).split(",") if x.strip().isdigit()
+                ]
+            relacionadas_ids = [rid for rid in relacionadas_ids if rid != faq_id]
+        # Optional field used by video generation (can be null)
+        video_text_in_payload = "video_text" in data
+        video_text_value = (data.get("video_text", "") or "").strip() or None
+        # Fetch current values to check if resposta or video_text changed
+        cur.execute(
+            "SELECT resposta, video_text, chatbot_id, designacao, pergunta, idioma, identificador, video_status FROM faq WHERE faq_id = %s",
+            (faq_id,),
+        )
+        old = cur.fetchone()
+        old_resposta = old[0] if old else None
+        old_video_text = old[1] if old else None
+        chatbot_id = old[2] if old else None
+        old_designacao = old[3] if old else None
+        old_pergunta = old[4] if old else None
+        old_idioma = old[5] if old else None
+        old_identificador = old[6] if old else None
+        old_video_status = old[7] if old else None
+
+        # Block edits during video generation:
+        # - If THIS FAQ video is queued/processing -> block editing this FAQ.
+        # - If any video job is active and THIS FAQ already has a ready video -> block editing.
+        job = get_video_job_status() or {}
+        job_status = job.get("status")
+        job_kind = job.get("kind")
+        job_faq_id = job.get("faq_id")
+        is_job_active = job_status in {"queued", "processing"}
+
+        if old_video_status in {"queued", "processing"}:
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "busy": True,
+                        "error": "Não é possível editar esta FAQ enquanto o vídeo desta FAQ está a ser gerado.",
+                    }
+                ),
+                409,
+            )
+        if is_job_active and job_kind == "faq" and job_faq_id and int(job_faq_id) == int(faq_id):
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "busy": True,
+                        "error": "Não é possível editar esta FAQ enquanto o vídeo desta FAQ está a ser gerado.",
+                    }
+                ),
+                409,
+            )
+        if is_job_active and old_video_status == "ready":
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "busy": True,
+                        "error": "Não é possível editar FAQs com vídeo já gerado enquanto existe outro vídeo a ser gerado.",
+                    }
+                ),
+                409,
+            )
+
+        # Check if the new values would create a duplicate (excluding current FAQ)
+        # Use old_designacao if designacao is not provided in the update
+        designacao = data.get("designacao", "").strip()
+        if not designacao:
+            designacao = old_designacao or ""
+        
+        # Only check for duplicates if at least one field changed
+        if designacao == (old_designacao or "") and pergunta == (old_pergunta or "") and resposta == (old_resposta or "") and idioma == (old_idioma or "pt"):
+            # No changes, skip duplicate check
+            pass
+        else:
+            cur.execute("""
+                SELECT faq_id FROM faq
+                WHERE chatbot_id = %s AND designacao = %s AND pergunta = %s AND resposta = %s AND idioma = %s
+                AND faq_id != %s
+            """, (chatbot_id, designacao, pergunta, resposta, idioma, faq_id))
+            if cur.fetchone():
+                return jsonify({"success": False, "error": "Esta combinação (chatbot, designação, pergunta, resposta e idioma) já existe noutra FAQ."}), 409
+
+        try:
+            if video_text_in_payload:
+                cur.execute(
+                    """
+                    UPDATE faq
+                    SET pergunta=%s,
+                        serve_text=%s,
+                        resposta=%s,
+                        idioma=%s,
+                        categoria_id=%s,
+                        recomendado=%s,
+                        designacao=%s,
+                        video_text=%s,
+                        identificador=%s
+                    WHERE faq_id=%s
+                    """,
+                    (pergunta, serve_text, resposta, idioma, categoria_id, recomendado, designacao, video_text_value, identificador or None, faq_id),
+                )
+            else:
+                cur.execute(
+                    """
+                    UPDATE faq
+                    SET pergunta=%s,
+                        serve_text=%s,
+                        resposta=%s,
+                        idioma=%s,
+                        categoria_id=%s,
+                        recomendado=%s,
+                        designacao=%s,
+                        identificador=%s
+                    WHERE faq_id=%s
+                    """,
+                    (pergunta, serve_text, resposta, idioma, categoria_id, recomendado, designacao, identificador or None, faq_id),
+                )
+            # Atualizar FAQs relacionadas (se fornecidas)
+            if relacionadas_raw is not None:
+                cur.execute("DELETE FROM faq_relacionadas WHERE faq_id = %s", (faq_id,))
+                for rel_id in relacionadas_ids:
+                    cur.execute(
+                        "INSERT INTO faq_relacionadas (faq_id, faq_relacionada_id) VALUES (%s, %s)",
+                        (faq_id, rel_id),
+                    )
+            conn.commit()
+            build_faiss_index()
+        except Exception as update_error:
+            error_msg = str(update_error)
+            # Check for unique constraint violation
+            if "duplicate key value violates unique constraint" in error_msg.lower() or "faq_chatbot_id_designacao_pergunta_resposta_idioma_key" in error_msg:
+                return jsonify({"success": False, "error": "Esta combinação (chatbot, designação, pergunta, resposta e idioma) já existe noutra FAQ."}), 409
+            raise  # Re-raise if it's a different error
+
         return jsonify({"success": True})
     except Exception as e:
         conn.rollback()
@@ -124,41 +310,68 @@ def add_faq():
             return jsonify({"success": False, "error": "O campo 'idioma' é obrigatório."}), 400
         links_documentos = data.get("links_documentos", "").strip()
         recomendado = data.get("recomendado", False)
+        identificador = (data.get("identificador") or "").strip()
+        serve_text = (data.get("serve_text") or "").strip() or None
+        video_text = data.get("video_text", "").strip() or None
         cur.execute("""
-            SELECT faq_id FROM FAQ
+            SELECT faq_id FROM faq
             WHERE chatbot_id = %s AND designacao = %s AND pergunta = %s AND resposta = %s AND idioma = %s
         """, (data["chatbot_id"], data["designacao"], data["pergunta"], data["resposta"], idioma))
         if cur.fetchone():
             return jsonify({"success": False, "error": "Esta FAQ já está inserida."}), 409
-        cur.execute("""
-            INSERT INTO FAQ (chatbot_id, categoria_id, designacao, pergunta, resposta, idioma, links_documentos, recomendado)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-            RETURNING faq_id
-        """, (
-            data["chatbot_id"],
-            data["categoria_id"],
-            data["designacao"],
-            data["pergunta"],
-            data["resposta"],
-            idioma,
-            links_documentos,
-            recomendado
-        ))
-        faq_id = cur.fetchone()[0]
+
+        try:
+            cur.execute("""
+                INSERT INTO faq (chatbot_id, categoria_id, designacao, identificador, pergunta, serve_text, resposta, idioma, links_documentos, recomendado, video_text)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING faq_id
+            """, (
+                data["chatbot_id"],
+                data["categoria_id"],
+                data["designacao"],
+                identificador or None,
+                data["pergunta"],
+                serve_text,
+                data["resposta"],
+                idioma,
+                links_documentos,
+                recomendado,
+                video_text,
+            ))
+            faq_id = cur.fetchone()[0]
+        except Exception as insert_error:
+            error_msg = str(insert_error)
+            # Check for unique constraint violation
+            if "duplicate key value violates unique constraint" in error_msg.lower() or "faq_chatbot_id_designacao_pergunta_resposta_idioma_key" in error_msg:
+                return jsonify({"success": False, "error": "Esta FAQ já existe com os mesmos valores (chatbot, designação, pergunta, resposta e idioma)."}), 409
+            raise  # Re-raise if it's a different error
         if links_documentos:
             for link in links_documentos.split(','):
                 link = link.strip()
                 if link:
                     cur.execute(
-                        "INSERT INTO FAQ_Documento (faq_id, link) VALUES (%s, %s)",
+                        "INSERT INTO faq_documento (faq_id, link) VALUES (%s, %s)",
                         (faq_id, link)
                     )
-        if "relacionadas" in data and data["relacionadas"].strip():
-            for rel_id in data["relacionadas"].split(','):
-                cur.execute("INSERT INTO FAQ_Relacionadas (faq_id, faq_relacionada_id) VALUES (%s, %s)", (faq_id, int(rel_id.strip())))
+        if "relacionadas" in data:
+            relacionadas_raw = data.get("relacionadas") or []
+            if isinstance(relacionadas_raw, list):
+                relacionadas_ids = [int(x) for x in relacionadas_raw if str(x).strip().isdigit()]
+            else:
+                relacionadas_ids = [
+                    int(x.strip()) for x in str(relacionadas_raw).split(",") if x.strip().isdigit()
+                ]
+            relacionadas_ids = [rid for rid in relacionadas_ids if rid != faq_id]
+            for rel_id in relacionadas_ids:
+                cur.execute(
+                    "INSERT INTO faq_relacionadas (faq_id, faq_relacionada_id) VALUES (%s, %s)",
+                    (faq_id, rel_id),
+                )
         conn.commit()
         build_faiss_index()
-        return jsonify({"success": True, "faq_id": faq_id})
+
+        # Vídeo para FAQ deixa de ser gerado automaticamente: passa a ser pedido explicitamente na página de FAQs.
+        return jsonify({"success": True, "faq_id": faq_id, "video_queued": False})
     except Exception as e:
         conn.rollback()
         return jsonify({"success": False, "error": str(e)}), 500
@@ -171,9 +384,47 @@ def delete_faq(faq_id):
     conn = get_conn()
     cur = conn.cursor()
     try:
-        cur.execute("DELETE FROM FAQ WHERE faq_id = %s", (faq_id,))
+        # Fetch video_path and chatbot_id before deleting
+        cur.execute("SELECT video_path, chatbot_id FROM faq WHERE faq_id = %s", (faq_id,))
+        row = cur.fetchone()
+        video_path = row[0] if row else None
+        chatbot_id = row[1] if row else None
+
+        cur.execute("DELETE FROM faq WHERE faq_id = %s", (faq_id,))
         conn.commit()
         build_faiss_index()
+
+        # Delete video file if it exists
+        if video_path and os.path.isfile(video_path):
+            try:
+                os.remove(video_path)
+            except Exception:
+                pass
+
+        # Best-effort cleanup for current naming scheme (results/chatbot_{id}/faq_{faq_id}/final.mp4)
+        try:
+            result_root = RESULTS_DIR if RESULTS_DIR.is_absolute() else (ROOT / RESULTS_DIR)
+            if chatbot_id:
+                # New location: chatbot_{id}/faq_{faq_id}/
+                expected_dir = result_root / f"chatbot_{chatbot_id}" / f"faq_{faq_id}"
+                if expected_dir.exists() and expected_dir.is_dir():
+                    import shutil
+                    shutil.rmtree(expected_dir, ignore_errors=True)
+            # Also try legacy location (results/faq_{faq_id}/) for backwards compatibility
+            legacy_dir = result_root / f"faq_{faq_id}"
+            if legacy_dir.exists() and legacy_dir.is_dir():
+                import shutil
+                shutil.rmtree(legacy_dir, ignore_errors=True)
+            # also remove any legacy variants
+            for p in result_root.glob(f"faq_{faq_id}*.mp4"):
+                try:
+                    if p.is_file():
+                        p.unlink()
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
         return jsonify({"success": True})
     except Exception as e:
         conn.rollback()
@@ -188,11 +439,12 @@ def get_faqs_detalhes():
     cur = conn.cursor()
     try:
         cur.execute("""
-            SELECT f.faq_id, f.chatbot_id, f.designacao, f.pergunta, f.resposta, f.idioma, f.links_documentos,
-                   f.categoria_id, c.nome AS categoria_nome, ch.nome AS chatbot_nome, f.recomendado
-            FROM FAQ f
-            LEFT JOIN Categoria c ON f.categoria_id = c.categoria_id
-            LEFT JOIN Chatbot ch ON f.chatbot_id = ch.chatbot_id
+            SELECT f.faq_id, f.chatbot_id, f.designacao, f.pergunta, f.serve_text, f.resposta, f.idioma, f.links_documentos,
+                   f.categoria_id, c.nome AS categoria_nome, ch.nome AS chatbot_nome, f.recomendado,
+                   f.video_status, f.video_path, f.video_text, f.identificador
+            FROM faq f
+            LEFT JOIN categoria c ON f.categoria_id = c.categoria_id
+            LEFT JOIN chatbot ch ON f.chatbot_id = ch.chatbot_id
             ORDER BY f.faq_id
         """)
         data = cur.fetchall()
@@ -202,13 +454,18 @@ def get_faqs_detalhes():
                 "chatbot_id": r[1],
                 "designacao": r[2],
                 "pergunta": r[3],
-                "resposta": r[4],
-                "idioma": r[5],
-                "links_documentos": r[6],
-                "categoria_id": r[7],
-                "categoria_nome": r[8],
-                "chatbot_nome": r[9],
-                "recomendado": r[10]
+                "serve_text": r[4],
+                "resposta": r[5],
+                "idioma": r[6],
+                "links_documentos": r[7],
+                "categoria_id": r[8],
+                "categoria_nome": r[9],
+                "chatbot_nome": r[10],
+                "recomendado": r[11],
+                "video_status": r[12],
+                "video_path": r[13],
+                "video_text": r[14],
+                "identificador": r[15],
             }
             for r in data
         ])

@@ -1,26 +1,34 @@
 let botIdAEliminar = null;
 let botIdCategorias = null;
 
-window.abrirModalEliminarBot = function(chatbot_id) {
+window.abrirModalEliminarBot = function (chatbot_id) {
   botIdAEliminar = chatbot_id;
-  const modal = document.getElementById('modalConfirmarEliminarBot');
-  if (modal) modal.style.display = 'flex';
+  const modal = document.getElementById("modalConfirmarEliminarBot");
+  if (modal) modal.style.display = "flex";
 };
 
-window.fecharModalEliminarBot = function() {
+window.fecharModalEliminarBot = function () {
   botIdAEliminar = null;
-  const modal = document.getElementById('modalConfirmarEliminarBot');
-  if (modal) modal.style.display = 'none';
+  const modal = document.getElementById("modalConfirmarEliminarBot");
+  if (modal) modal.style.display = "none";
 };
 
-window.abrirModalCategorias = async function(chatbot_id) {
+window.abrirModalCategorias = async function (chatbot_id) {
   botIdCategorias = chatbot_id;
   await renderizarCategoriasChatbot(chatbot_id);
   const modal = document.getElementById("modalCategorias");
   if (modal) modal.style.display = "flex";
+  // If edit modal is open for this chatbot, refresh the view-only list
+  try {
+    const editarForm = document.getElementById("editarChatbotForm");
+    const editId = editarForm ? editarForm.getAttribute("data-edit-id") : null;
+    if (editId && String(editId) === String(chatbot_id)) {
+      await mostrarModalEditarChatbot(chatbot_id);
+    }
+  } catch (e) {}
 };
 
-window.fecharModalCategorias = function() {
+window.fecharModalCategorias = function () {
   const modal = document.getElementById("modalCategorias");
   if (modal) modal.style.display = "none";
   botIdCategorias = null;
@@ -29,19 +37,26 @@ window.fecharModalCategorias = function() {
 async function renderizarCategoriasChatbot(chatbot_id) {
   const container = document.getElementById("categoriasContainer");
   if (!container) return;
-  container.innerHTML = "<span style='color:#888;'>A carregar categorias...</span>";
+  container.innerHTML =
+    "<span style='color:#888;'>A carregar categorias...</span>";
 
   try {
-    const associadas = await fetch(`/chatbots/${chatbot_id}/categorias`).then(r => r.json());
+    const associadas = await fetch(`/chatbots/${chatbot_id}/categorias`).then(
+      (r) => r.json(),
+    );
 
-    let categoriasHtml = '';
+    let categoriasHtml = "";
     if (associadas && associadas.length > 0) {
-      categoriasHtml = associadas.map(cat => `
+      categoriasHtml = associadas
+        .map(
+          (cat) => `
         <div class="categoria-row">
           <span>${cat.nome}</span>
           <button class="btn-eliminar-cat" onclick="removerAssociacaoCategoria(${chatbot_id}, ${cat.categoria_id})" title="Remover">Eliminar</button>
         </div>
-      `).join("");
+      `,
+        )
+        .join("");
     } else {
       categoriasHtml = `<span style='color:#888;'>Nenhuma categoria associada a este chatbot.</span>`;
     }
@@ -59,33 +74,61 @@ async function renderizarCategoriasChatbot(chatbot_id) {
   }
 }
 
-window.toggleAssociacaoCategoria = async function(chatbot_id, categoria_id, checked) {
+window.toggleAssociacaoCategoria = async function (
+  chatbot_id,
+  categoria_id,
+  checked,
+) {
   try {
     if (checked) {
       await fetch(`/chatbots/${chatbot_id}/categorias`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ categoria_id })
+        body: JSON.stringify({ categoria_id }),
       });
     } else {
-      await fetch(`/chatbots/${chatbot_id}/categorias/${categoria_id}`, { method: "DELETE" });
+      await fetch(`/chatbots/${chatbot_id}/categorias/${categoria_id}`, {
+        method: "DELETE",
+      });
     }
     await renderizarCategoriasChatbot(chatbot_id);
+    // Keep edit modal categories view in sync
+    try {
+      const editarForm = document.getElementById("editarChatbotForm");
+      const editId = editarForm
+        ? editarForm.getAttribute("data-edit-id")
+        : null;
+      if (editId && String(editId) === String(chatbot_id)) {
+        await mostrarModalEditarChatbot(chatbot_id);
+      }
+    } catch (e) {}
   } catch (err) {
     alert("Erro ao atualizar associação de categoria: " + err.message);
   }
 };
 
-window.removerAssociacaoCategoria = async function(chatbot_id, categoria_id) {
+window.removerAssociacaoCategoria = async function (chatbot_id, categoria_id) {
   try {
-    await fetch(`/chatbots/${chatbot_id}/categorias/${categoria_id}`, { method: "DELETE" });
+    await fetch(`/chatbots/${chatbot_id}/categorias/${categoria_id}`, {
+      method: "DELETE",
+    });
     await renderizarCategoriasChatbot(chatbot_id);
+    // Keep edit modal categories view in sync
+    try {
+      const editarForm = document.getElementById("editarChatbotForm");
+      const editId = editarForm
+        ? editarForm.getAttribute("data-edit-id")
+        : null;
+      if (editId && String(editId) === String(chatbot_id)) {
+        await mostrarModalEditarChatbot(chatbot_id);
+      }
+    } catch (e) {}
   } catch (err) {
     alert("Erro ao remover associação de categoria: " + err.message);
   }
 };
 
-window.adicionarCategoriaDireta = async function() {
+window.adicionarCategoriaDireta = async function () {
   const input = document.getElementById("novaCategoriaInput");
   const nome = input.value.trim();
   if (!nome) return;
@@ -95,12 +138,12 @@ window.adicionarCategoriaDireta = async function() {
     let res = await fetch("/categorias", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome })
+      body: JSON.stringify({ nome }),
     });
 
     if (res.status === 409) {
-      let cats = await fetch("/categorias").then(r => r.json());
-      let cat = cats.find(c => c.nome.toLowerCase() === nome.toLowerCase());
+      let cats = await fetch("/categorias").then((r) => r.json());
+      let cat = cats.find((c) => c.nome.toLowerCase() === nome.toLowerCase());
       if (cat) categoria_id = cat.categoria_id;
       else {
         alert("Erro inesperado ao encontrar categoria existente!");
@@ -116,7 +159,7 @@ window.adicionarCategoriaDireta = async function() {
     await fetch(`/chatbots/${botIdCategorias}/categorias`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ categoria_id })
+      body: JSON.stringify({ categoria_id }),
     });
     input.value = "";
     await renderizarCategoriasChatbot(botIdCategorias);
@@ -129,10 +172,32 @@ async function eliminarChatbotConfirmado(chatbot_id) {
   try {
     const res = await fetch(`/chatbots/${chatbot_id}`, { method: "DELETE" });
     if (res.ok) {
+      // If the deleted chatbot was the active one, clear it from localStorage
+      const ativoId = localStorage.getItem("chatbotAtivo");
+      if (ativoId && String(ativoId) === String(chatbot_id)) {
+        localStorage.removeItem("chatbotAtivo");
+        localStorage.removeItem("videoGreetingPath");
+        localStorage.removeItem("videoIdlePath");
+        // Reset color to default
+        localStorage.setItem("corChatbot", "#d4af37");
+        // Update chat UI to show default/fallback
+        if (typeof window.atualizarNomeChatHeader === "function") {
+          await window.atualizarNomeChatHeader();
+        }
+        if (typeof window.atualizarCorChatbot === "function") {
+          window.atualizarCorChatbot();
+        }
+        if (typeof window.setupAvatarVideo === "function") {
+          window.setupAvatarVideo();
+        }
+      }
       carregarTabelaBots();
     } else {
       const result = await res.json();
-      alert("Erro ao eliminar o chatbot: " + (result.error || result.erro || res.statusText));
+      alert(
+        "Erro ao eliminar o chatbot: " +
+          (result.error || result.erro || res.statusText),
+      );
     }
   } catch (err) {
     alert("Erro ao comunicar com o servidor: " + err.message);
@@ -151,6 +216,17 @@ async function carregarTabelaBots() {
       container.innerHTML = "<p>Nenhum bot encontrado.</p>";
       return;
     }
+
+    // Sync global active chatbot to localStorage so other components don't rely on stale cache.
+    try {
+      const activeBot = bots.find((b) => !!b.ativo);
+      if (activeBot && activeBot.chatbot_id != null) {
+        localStorage.setItem("chatbotAtivo", String(activeBot.chatbot_id));
+        try {
+          window.chatbotAtivo = parseInt(activeBot.chatbot_id);
+        } catch (e) {}
+      }
+    } catch (e) {}
 
     for (const bot of bots) {
       try {
@@ -173,8 +249,10 @@ async function carregarTabelaBots() {
       <table class="bots-tabela">
         <thead>
           <tr>
+            <th>ID</th>
             <th>Nome</th>
             <th>Descrição</th>
+            <th>Endereço de Publicação</th>
             <th>Data de Criação</th>
             <th>Estado</th>
             <th>Fonte</th>
@@ -184,36 +262,65 @@ async function carregarTabelaBots() {
           </tr>
         </thead>
         <tbody>
-          ${bots.map(bot => `
+          ${bots
+            .map(
+              (bot) => `
             <tr data-chatbot-id="${bot.chatbot_id}">
+              <td>${bot.chatbot_id ?? "-"}</td>
               <td>${bot.nome || "-"}</td>
               <td>${bot.descricao || "-"}</td>
+              <td>${bot.endereco || "-"}</td>
               <td>${formatarData(bot.data_criacao)}</td>
               <td>
-                <span class="estado-indicador ${isAtivo(bot.chatbot_id) ? "ativo" : "inativo"}">
-                  ${isAtivo(bot.chatbot_id) ? "Ativo" : "Não Publicado"}
+                <span class="estado-indicador ${obterClasseEstadoBot(bot)}">
+                  ${obterLabelEstadoBot(bot)}
                 </span>
               </td>
               <td>
-                <span class="fonte-indicador">${obterNomeFonte(bot.fonte)}</span>
+                <span class="fonte-indicador">${obterNomeFonte(
+                  bot.fonte,
+                )}</span>
               </td>
               <td class="cor">
-                <span class="cor-bot-preview" style="background:${bot.cor || '#d4af37'}"></span>
+                <span class="cor-bot-preview" style="background:${
+                  bot.cor || "#d4af37"
+                }"></span>
               </td>
               <td class="icone">
-                <img src="${bot.icon_path || '/static/images/chatbot-icon.png'}" alt="Ícone do Bot" style="width:24px; height:24px; border-radius:4px; object-fit:cover;">
+                <img src="${
+                  bot.icon_path || "/static/images/chatbot/chatbot-icon.png"
+                }" alt="Ícone do Bot" style="width:24px; height:24px; border-radius:4px; object-fit:cover;">
               </td>
               <td>
-                <button class="btn-ativo" onclick="tornarBotAtivo(${bot.chatbot_id}, this)">
-                  ${isAtivo(bot.chatbot_id) ? "Ativo" : "Tornar Ativo"}
+                <button
+                  class="btn-publicar ${bot.ativo || bot.publicado ? "ativo" : ""}"
+                  onclick="publicarBot(${bot.chatbot_id})"
+                  ${bot.ativo || bot.publicado ? "disabled" : ""}
+                >
+                  ${bot.ativo || bot.publicado ? "Publicado" : "Publicar"}
                 </button>
-                <button class="btn-editar" onclick="abrirModalAtualizar(${bot.chatbot_id})">Atualizar</button>
-                <button class="btn-categorias" onclick="abrirModalCategorias(${bot.chatbot_id})">Categorias</button>
-                <button class="btn-eliminar" onclick="abrirModalEliminarBot(${bot.chatbot_id})">Eliminar</button>
-                <button class="btn-adicionar-faq" onclick="abrirModalAdicionarFAQ(${bot.chatbot_id})">Adicionar FAQ</button>
+                <button class="btn-ativo" onclick="tornarBotAtivo(${
+                  bot.chatbot_id
+                }, this)">
+                  ${bot.ativo ? "Ativo" : "Tornar Ativo"}
+                </button>
+                <button class="btn-editar" onclick="abrirModalAtualizar(${
+                  bot.chatbot_id
+                })">Atualizar</button>
+                <button class="btn-categorias" onclick="abrirModalCategorias(${
+                  bot.chatbot_id
+                })">Categorias</button>
+                <button class="btn-eliminar" onclick="abrirModalEliminarBot(${
+                  bot.chatbot_id
+                })">Eliminar</button>
+                <button class="btn-adicionar-faq" onclick="abrirModalAdicionarFAQ(${
+                  bot.chatbot_id
+                })">Adicionar FAQ</button>
               </td>
             </tr>
-          `).join("")}
+          `,
+            )
+            .join("")}
         </tbody>
       </table>
     `;
@@ -223,15 +330,20 @@ async function carregarTabelaBots() {
 }
 
 function aplicarFiltrosBots(bots) {
-  const nomeFiltro = document.getElementById("filtroNomeBot")?.value?.trim().toLowerCase() || "";
-  const estadoFiltro = document.getElementById("filtroEstadoBot")?.value || "todos";
-  const dataFiltro = document.getElementById("filtroDataCriacaoBot")?.value || "";
+  const nomeFiltro =
+    document.getElementById("filtroNomeBot")?.value?.trim().toLowerCase() || "";
+  const estadoFiltro =
+    document.getElementById("filtroEstadoBot")?.value || "todos";
+  const dataFiltro =
+    document.getElementById("filtroDataCriacaoBot")?.value || "";
 
-  return bots.filter(bot => {
-    if (nomeFiltro && !(bot.nome || "").toLowerCase().includes(nomeFiltro)) return false;
-    const ativo = isAtivo(bot.chatbot_id);
+  return bots.filter((bot) => {
+    if (nomeFiltro && !(bot.nome || "").toLowerCase().includes(nomeFiltro))
+      return false;
+    const ativo = !!bot.ativo;
+    const publicado = !!bot.publicado || ativo;
     if (estadoFiltro === "ativo" && !ativo) return false;
-    if (estadoFiltro === "nao_publicado" && ativo) return false;
+    if (estadoFiltro === "nao_publicado" && publicado) return false;
     if (dataFiltro) {
       const dataBot = bot.data_criacao ? new Date(bot.data_criacao) : null;
       const dataSelecionada = new Date(dataFiltro + "T00:00:00");
@@ -245,70 +357,160 @@ function formatarData(dataStr) {
   if (!dataStr) return "-";
   const data = new Date(dataStr);
   if (isNaN(data.getTime())) return "-";
-  return data.toLocaleDateString('pt-PT');
+  return data.toLocaleDateString("pt-PT");
+}
+
+function obterClasseEstadoBot(bot) {
+  if (bot.ativo || bot.publicado) return "ativo";
+  return "inativo";
+}
+
+function obterLabelEstadoBot(bot) {
+  if (bot.ativo) return "Ativo";
+  if (bot.publicado) return "Publicado";
+  return "Não Publicado";
 }
 
 function obterNomeFonte(fonte) {
   if (fonte === "faq") return "Baseado em Regras (FAQ)";
   if (fonte === "faiss") return "Só FAISS";
-  if (fonte === "faq+raga") return "FAQ + fallback RAG";
+  if (fonte === "faq+raga") return "FAQ + GenAI";
   return fonte;
 }
 
-function isAtivo(chatbot_id) {
-  return String(localStorage.getItem("chatbotAtivo")) === String(chatbot_id);
+function obterEstadoVideo(bot) {
+  if (bot.video_enabled) {
+    return "Vídeo ON";
+  }
+  return "Vídeo OFF";
 }
 
-window.tornarBotAtivo = function(chatbot_id, btn) {
+window.tornarBotAtivo = async function (chatbot_id, btn) {
   localStorage.setItem("chatbotAtivo", chatbot_id);
+  try {
+    window.chatbotAtivo = parseInt(chatbot_id);
+  } catch (e) {}
+
+  // Persist globally (server-side) so public users/new browsers inherit it.
+  try {
+    const r = await fetch(`/chatbots/${chatbot_id}/active`, { method: "PUT" });
+    if (!r.ok) {
+      throw new Error("Falha ao ativar chatbot.");
+    }
+  } catch (e) {}
+
+  // Garantir que localStorage tem o nome/icon/cor do bot ativo ANTES de reiniciar o chat
+  try {
+    const res = await fetch(`/chatbots/${chatbot_id}`);
+    const data = await res.json();
+    if (data && data.success) {
+      if (data.nome) localStorage.setItem("nomeBot", data.nome);
+      if (data.cor) localStorage.setItem("corChatbot", data.cor);
+      if (data.icon) localStorage.setItem("iconBot", data.icon);
+      if (data.genero !== undefined)
+        localStorage.setItem("generoBot", data.genero || "");
+      if (data.video_greeting_path)
+        localStorage.setItem("videoGreetingPath", data.video_greeting_path);
+      if (data.video_idle_path)
+        localStorage.setItem("videoIdlePath", data.video_idle_path);
+    }
+  } catch (e) {}
+
+  // Only update chat UI if chat sidebar is actually open/visible
+  const chatSidebar = document.getElementById("chatSidebar");
+  const isChatOpen = chatSidebar && chatSidebar.style.display !== "none";
+
+  if (isChatOpen) {
+    try {
+      if (typeof window.atualizarNomeChatHeader === "function") {
+        await window.atualizarNomeChatHeader();
+      }
+      if (typeof window.reiniciarConversa === "function") {
+        try {
+          if (typeof hasPlayedGreeting !== "undefined") {
+            hasPlayedGreeting = false;
+          }
+        } catch (e) {}
+        await window.reiniciarConversa();
+      }
+    } catch (e) {}
+  }
+
   carregarTabelaBots();
 };
 
-document.addEventListener("DOMContentLoaded", function () {
-  const novoBotForm = document.getElementById("novoBotForm");
-  if (novoBotForm) {
-    novoBotForm.onsubmit = async function(e) {
-      e.preventDefault();
-      const nome = novoBotForm.elements["nome"].value.trim();
-      const descricao = novoBotForm.elements["descricao"].value.trim();
-      const mensagem_sem_resposta = novoBotForm.elements["mensagem_sem_resposta"].value.trim();
-      const cor = novoBotForm.elements["cor"].value.trim();
-      if (!nome) {
-        alert("Nome obrigatório");
-        return;
-      }
-      const body = { nome, descricao, mensagem_sem_resposta, cor };
-      try {
-        const res = await fetch(`/chatbots`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-        if (res.ok) {
-          window.fecharModalNovoBot();
-          carregarTabelaBots();
-        } else {
-          const result = await res.json().catch(() => ({}));
-          alert("Erro ao criar chatbot: " + (result.error || result.erro || res.statusText));
-        }
-      } catch (err) {
-        alert("Erro ao criar chatbot: " + err.message);
-      }
-    };
+window.publicarBot = async function (chatbot_id) {
+  try {
+    const r = await fetch(`/chatbots/${chatbot_id}/publish`, { method: "PUT" });
+    if (!r.ok) {
+      throw new Error("Falha ao publicar chatbot.");
+    }
+    carregarTabelaBots();
+  } catch (e) {
+    alert("Erro ao publicar chatbot: " + e.message);
   }
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+  // NOTE: criação de chatbot (modal Novo Bot) é tratada por `AdicionarBot.js`
+  // para suportar upload de icon + video_enabled via multipart/form-data.
 
   const editarForm = document.getElementById("editarChatbotForm");
   if (editarForm) {
-    editarForm.onsubmit = async function(e) {
+    editarForm.onsubmit = async function (e) {
       e.preventDefault();
       const chatbot_id = this.getAttribute("data-edit-id");
       const nome = document.getElementById("editarNomeChatbot").value.trim();
-      const descricao = document.getElementById("editarDescricaoChatbot").value.trim();
+      const descricao = document
+        .getElementById("editarDescricaoChatbot")
+        .value.trim();
+      const endereco = document
+        .getElementById("editarEnderecoChatbot")
+        .value.trim();
       const fonte = document.getElementById("editarFonteResposta").value;
       const cor = document.getElementById("editarCorChatbot").value.trim();
-      const mensagem_sem_resposta = document.getElementById("editarMensagemSemResposta").value.trim();
+      const mensagem_sem_resposta = document
+        .getElementById("editarMensagemSemResposta")
+        .value.trim();
+      const greeting_video_text = document.getElementById(
+        "editarGreetingVideoText",
+      )
+        ? document.getElementById("editarGreetingVideoText").value.trim()
+        : "";
+      const mensagem_inicial = document.getElementById("editarMensagemInicial")
+        ? document.getElementById("editarMensagemInicial").value.trim()
+        : "";
+      const mensagem_gerada_ai = document.getElementById(
+        "editarMensagemGeradaAI",
+      )
+        ? document.getElementById("editarMensagemGeradaAI").value.trim()
+        : "";
+      const mensagem_feedback_positiva = document.getElementById(
+        "editarMensagemFeedbackPositiva",
+      )
+        ? document.getElementById("editarMensagemFeedbackPositiva").value.trim()
+        : "";
+      const mensagem_feedback_negativa = document.getElementById(
+        "editarMensagemFeedbackNegativa",
+      )
+        ? document.getElementById("editarMensagemFeedbackNegativa").value.trim()
+        : "";
+      const genero = document.getElementById("editarGeneroChatbot").value;
+      const video_enabled = document.getElementById("editarVideoEnabledChatbot")
+        ? document.getElementById("editarVideoEnabledChatbot").checked
+        : false;
       const iconInput = document.getElementById("editarIconChatbot");
       const iconFile = iconInput.files[0];
+
+      const oldNome = (this.dataset.oldNome || "").trim();
+      const oldIdioma = (this.dataset.oldIdioma || "pt").trim().toLowerCase();
+      const oldGenero = (this.dataset.oldGenero || "").trim();
+      const oldGreetingText = (this.dataset.oldGreetingVideoText || "").trim();
+      const oldMsgNoAnswer = (this.dataset.oldMensagemSemResposta || "").trim();
+      const oldMsgPos = (this.dataset.oldMensagemFeedbackPositiva || "").trim();
+      const oldMsgNeg = (this.dataset.oldMensagemFeedbackNegativa || "").trim();
+      const wasVideoEnabled =
+        String(this.dataset.oldVideoEnabled || "0") === "1";
 
       if (!nome) {
         alert("Nome obrigatório");
@@ -317,25 +519,228 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const formData = new FormData();
       formData.append("nome", nome);
+      formData.append("idioma", (idioma || "pt").trim());
       formData.append("descricao", descricao);
+      formData.append("endereco", endereco);
       formData.append("fonte", fonte);
       formData.append("cor", cor);
       formData.append("mensagem_sem_resposta", mensagem_sem_resposta);
+      formData.append("greeting_video_text", greeting_video_text);
+      formData.append("mensagem_inicial", mensagem_inicial);
+      formData.append("mensagem_gerada_ai", mensagem_gerada_ai);
+      formData.append("mensagem_feedback_positiva", mensagem_feedback_positiva);
+      formData.append("mensagem_feedback_negativa", mensagem_feedback_negativa);
+      formData.append("genero", genero);
+      formData.append("video_enabled", video_enabled ? "true" : "false");
       if (iconFile) formData.append("icon", iconFile);
+
+      // Detect which videos are affected and ask whether to regenerate.
+      // If video was just enabled, regeneration is required to have usable videos.
+      const kindsNeeded = new Set();
+      const nomeChanged = oldNome !== nome;
+      const idiomaChanged =
+        (oldIdioma || "pt") !== ((idioma || "pt").trim().toLowerCase() || "pt");
+      const generoChanged = oldGenero !== (genero || "").trim();
+      const iconChanged = !!iconFile;
+      const greetingTextChanged =
+        oldGreetingText !== (greeting_video_text || "").trim();
+      const msgNoAnswerChanged =
+        oldMsgNoAnswer !== (mensagem_sem_resposta || "").trim();
+      const msgPosChanged =
+        oldMsgPos !== (mensagem_feedback_positiva || "").trim();
+      const msgNegChanged =
+        oldMsgNeg !== (mensagem_feedback_negativa || "").trim();
+
+      const avatarOrVoiceChanged =
+        nomeChanged || generoChanged || iconChanged || idiomaChanged;
+
+      // Special warning when changing avatar: initial chatbot videos will be regenerated,
+      // but FAQ videos are not regenerated automatically.
+      if (iconChanged && video_enabled) {
+        // Pre-check if a video job is already running (same rule as other video actions).
+        try {
+          const st = await fetch("/video/status").then((r) => r.json());
+          const job = st && st.job ? st.job : null;
+          const status = job && job.status ? String(job.status) : "";
+          if (status === "queued" || status === "processing") {
+            if (typeof mostrarModalVideoBusy === "function") {
+              mostrarModalVideoBusy(
+                "Já existe um vídeo a ser gerado neste momento. Aguarde que termine antes de atualizar o avatar (isso requer regenerar vídeos do chatbot).",
+              );
+            }
+            return;
+          }
+        } catch (e) {
+          // If status check fails, keep going; backend will still protect queuing.
+        }
+
+        const ok = confirm(
+          "Detetámos que alterou o avatar. Os vídeos do chatbot (saudação/idle/feedback) serão regenerados automaticamente.\n\nOs vídeos das FAQs NÃO serão regenerados automaticamente — se quiser, terá de os regenerar manualmente no backoffice.\n\nContinuar?",
+        );
+        if (!ok) return;
+      }
+
+      if (video_enabled) {
+        if (!wasVideoEnabled) {
+          ["greeting", "idle", "positive", "negative", "no_answer"].forEach(
+            (k) => kindsNeeded.add(k),
+          );
+          const ok = confirm(
+            "Ativou os vídeos deste chatbot. É necessário gerar os vídeos agora. Quer iniciar a geração?",
+          );
+          if (!ok) {
+            // Don't allow enabling video without generation, to avoid broken UI/404s.
+            const cb = document.getElementById("editarVideoEnabledChatbot");
+            if (cb) cb.checked = false;
+            alert("Operação cancelada. Os vídeos continuam desativados.");
+            return;
+          }
+          formData.append("regen_videos", "true");
+          formData.append(
+            "video_kinds",
+            JSON.stringify(Array.from(kindsNeeded.values())),
+          );
+        } else {
+          if (avatarOrVoiceChanged) {
+            ["greeting", "idle", "positive", "negative", "no_answer"].forEach(
+              (k) => kindsNeeded.add(k),
+            );
+          } else {
+            if (greetingTextChanged) kindsNeeded.add("greeting");
+            if (msgPosChanged) kindsNeeded.add("positive");
+            if (msgNegChanged) kindsNeeded.add("negative");
+            if (msgNoAnswerChanged) kindsNeeded.add("no_answer");
+          }
+
+          if (kindsNeeded.size > 0) {
+            const orderedKinds = [
+              "greeting",
+              "idle",
+              "positive",
+              "negative",
+              "no_answer",
+            ].filter((k) => kindsNeeded.has(k));
+
+            const kindLabels = {
+              greeting: "Saudação",
+              idle: "Idle",
+              positive: "Positivo",
+              negative: "Negativo",
+              no_answer: "Sem resposta",
+            };
+
+            const kindsText = orderedKinds
+              .map((k) => kindLabels[k] || k)
+              .join(" + ");
+
+            const notes = [];
+            if (msgPosChanged && !(mensagem_feedback_positiva || "").trim()) {
+              notes.push(
+                "O texto do vídeo Positivo ficou vazio e será usado o texto por defeito.",
+              );
+            }
+            if (msgNegChanged && !(mensagem_feedback_negativa || "").trim()) {
+              notes.push(
+                "O texto do vídeo Negativo ficou vazio e será usado o texto por defeito.",
+              );
+            }
+            if (msgNoAnswerChanged && !(mensagem_sem_resposta || "").trim()) {
+              notes.push(
+                "O texto do vídeo Sem resposta ficou vazio e será usado o texto por defeito.",
+              );
+            }
+            if (greetingTextChanged && !(greeting_video_text || "").trim()) {
+              notes.push(
+                "O texto do vídeo de Saudação ficou vazio e será usado o texto por defeito.",
+              );
+            }
+
+            const ok = confirm(
+              `Foram alterados campos que afetam vídeos (${kindsText}). Regenerar agora apenas estes vídeos?` +
+                (notes.length ? `\n\n${notes.join("\n")}` : ""),
+            );
+            formData.append("regen_videos", ok ? "true" : "false");
+            if (ok) {
+              formData.append(
+                "video_kinds",
+                JSON.stringify(Array.from(kindsNeeded.values())),
+              );
+            }
+          }
+        }
+      }
 
       try {
         const res = await fetch(`/chatbots/${chatbot_id}`, {
           method: "PUT",
-          body: formData
+          body: formData,
         });
-        await atualizarCategoriasDoChatbot(chatbot_id);
+        if (!res.ok && res.status === 409) {
+          const result = await res.json().catch(() => ({}));
+          // When a FAQ video job of this chatbot is running, backend blocks editing.
+          if (result && result.busy) {
+            const statusDiv = document.getElementById("editarChatbotStatus");
+            if (statusDiv) {
+              statusDiv.textContent =
+                result.error ||
+                "Não é possível editar este chatbot enquanto um vídeo está a ser gerado.";
+              statusDiv.style.color = "#b91c1c";
+            }
+            return;
+          }
+        }
         if (res.ok) {
+          const result = await res.json().catch(() => ({}));
+
+          // Refresh categories view-only list (it may have changed in the categories modal)
+          try {
+            await mostrarModalEditarChatbot(chatbot_id);
+          } catch (e) {}
+
+          // Mostrar modal se o backend não conseguiu enfileirar por já existir um job.
+          if (result && result.video_busy) {
+            if (typeof mostrarModalVideoBusy === "function") {
+              mostrarModalVideoBusy(
+                result.error ||
+                  "Já existe um vídeo a ser gerado neste momento. Aguarde que termine.",
+              );
+            } else {
+              const m = document.getElementById("modalVideoBusy");
+              if (m) m.style.display = "flex";
+            }
+          }
+
+          // Só ligar polling se o backend realmente enfileirou a geração.
+          if (result && result.video_queued) {
+            try {
+              localStorage.setItem("videoJobPolling", "1");
+            } catch (e) {}
+            if (typeof window.startVideoStatusPolling === "function") {
+              window.startVideoStatusPolling();
+            }
+          }
+
           localStorage.setItem(`fonteSelecionada_bot${chatbot_id}`, fonte);
+          const ativoId = localStorage.getItem("chatbotAtivo");
+          if (ativoId && String(ativoId) === String(chatbot_id)) {
+            localStorage.setItem("generoBot", genero || "");
+            localStorage.setItem("nomeBot", nome);
+            localStorage.setItem("corChatbot", cor || "#d4af37");
+            if (window.atualizarNomeChatHeader) {
+              await window.atualizarNomeChatHeader();
+            }
+            if (window.reiniciarConversa) {
+              await window.reiniciarConversa();
+            }
+          }
           window.fecharModalEditarChatbot();
           carregarTabelaBots();
         } else {
           const result = await res.json().catch(() => ({}));
-          alert("Erro ao atualizar chatbot: " + (result.error || result.erro || res.statusText));
+          alert(
+            "Erro ao atualizar chatbot: " +
+              (result.error || result.erro || res.statusText),
+          );
         }
       } catch (err) {
         alert("Erro ao atualizar chatbot: " + err.message);
@@ -343,8 +748,8 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   }
 
-  const btnSim = document.getElementById('btnConfirmarEliminarBot');
-  const btnNao = document.getElementById('btnCancelarEliminarBot');
+  const btnSim = document.getElementById("btnConfirmarEliminarBot");
+  const btnNao = document.getElementById("btnCancelarEliminarBot");
   if (btnSim) {
     btnSim.onclick = async function () {
       if (botIdAEliminar !== null) {
@@ -359,7 +764,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   carregarTabelaBots();
 
-  ["filtroNomeBot", "filtroEstadoBot", "filtroDataCriacaoBot"].forEach(id => {
+  ["filtroNomeBot", "filtroEstadoBot", "filtroDataCriacaoBot"].forEach((id) => {
     const el = document.getElementById(id);
     if (el) {
       el.addEventListener("input", carregarTabelaBots);
@@ -369,40 +774,157 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const iconInput = document.getElementById("editarIconChatbot");
   if (iconInput) {
-    iconInput.onchange = function(e) {
+    iconInput.onchange = function (e) {
       const file = e.target.files[0];
       const preview = document.getElementById("previewIcon");
-      if (file && file.type.startsWith('image/')) {
+      if (file && file.type.startsWith("image/")) {
         preview.src = URL.createObjectURL(file);
         preview.style.display = "block";
       } else {
-        preview.src = "/static/images/chatbot-icon.png";
+        preview.src = "/static/images/chatbot/chatbot-icon.png";
         preview.style.display = "none";
         alert("Por favor, selecione um arquivo de imagem válido.");
         iconInput.value = "";
       }
     };
   }
+
+  // Handle video_enabled checkbox to block/unblock nome, icon, genero fields
+  const videoEnabledCheckbox = document.getElementById(
+    "editarVideoEnabledChatbot",
+  );
+  if (videoEnabledCheckbox) {
+    const toggleFieldsBasedOnVideoEnabled = () => {
+      const isVideoEnabled = videoEnabledCheckbox.checked;
+      const nomeInput = document.getElementById("editarNomeChatbot");
+      const iconInput = document.getElementById("editarIconChatbot");
+      const generoSelect = document.getElementById("editarGeneroChatbot");
+
+      if (nomeInput) {
+        nomeInput.disabled = isVideoEnabled;
+        nomeInput.style.opacity = isVideoEnabled ? "0.6" : "1";
+        nomeInput.style.cursor = isVideoEnabled ? "not-allowed" : "text";
+      }
+      if (iconInput) {
+        // Allow avatar updates even when video is enabled (frontend will warn + regenerate videos).
+        iconInput.disabled = false;
+        iconInput.style.opacity = "1";
+        iconInput.style.cursor = "pointer";
+      }
+      if (generoSelect) {
+        generoSelect.disabled = isVideoEnabled;
+        generoSelect.style.opacity = isVideoEnabled ? "0.6" : "1";
+        generoSelect.style.cursor = isVideoEnabled ? "not-allowed" : "pointer";
+      }
+    };
+
+    videoEnabledCheckbox.addEventListener(
+      "change",
+      toggleFieldsBasedOnVideoEnabled,
+    );
+    // Also call on modal open (handled in abrirModalAtualizar)
+  }
 });
 
-window.abrirModalAtualizar = async function(chatbot_id) {
+window.abrirModalAtualizar = async function (chatbot_id) {
   try {
     const res = await fetch(`/chatbots`);
     const bots = await res.json();
-    const bot = bots.find(b => String(b.chatbot_id) === String(chatbot_id));
+    const bot = bots.find((b) => String(b.chatbot_id) === String(chatbot_id));
     if (!bot) {
       alert("Chatbot não encontrado!");
       return;
     }
-    document.getElementById("editarNomeChatbot").value = bot.nome || "";
-    document.getElementById("editarDescricaoChatbot").value = bot.descricao || "";
-    document.getElementById("editarDataCriacao").value = bot.data_criacao ? new Date(bot.data_criacao).toLocaleDateString('pt-PT') : "";
-    document.getElementById("editarFonteResposta").value = bot.fonte || "faq";
-    document.getElementById("editarCorChatbot").value = bot.cor || "#d4af37";
-    document.getElementById("editarMensagemSemResposta").value = bot.mensagem_sem_resposta || "";
-    document.getElementById("previewIcon").src = bot.icon_path || "/static/images/chatbot-icon.png";
-    document.getElementById("previewIcon").style.display = bot.icon_path ? "block" : "none";
-    document.getElementById("editarChatbotForm").setAttribute("data-edit-id", chatbot_id);
+
+    const setValueById = (id, value) => {
+      const el = document.getElementById(id);
+      if (!el) {
+        console.warn(`[abrirModalAtualizar] Elemento não encontrado: #${id}`);
+        return;
+      }
+      el.value = value;
+    };
+
+    setValueById("editarNomeChatbot", bot.nome || "");
+    setValueById("editarIdiomaChatbot", (bot.idioma || "pt").toLowerCase());
+    setValueById("editarDescricaoChatbot", bot.descricao || "");
+    setValueById("editarEnderecoChatbot", bot.endereco || "");
+    setValueById(
+      "editarDataCriacao",
+      bot.data_criacao
+        ? new Date(bot.data_criacao).toLocaleDateString("pt-PT")
+        : "",
+    );
+    setValueById("editarFonteResposta", bot.fonte || "faq");
+    setValueById("editarCorChatbot", bot.cor || "#d4af37");
+    setValueById("editarMensagemSemResposta", bot.mensagem_sem_resposta || "");
+    setValueById("editarGreetingVideoText", bot.greeting_video_text || "");
+    setValueById("editarMensagemInicial", bot.mensagem_inicial || "");
+    setValueById("editarMensagemGeradaAI", bot.mensagem_gerada_ai || "");
+    setValueById(
+      "editarMensagemFeedbackPositiva",
+      bot.mensagem_feedback_positiva || "",
+    );
+    setValueById(
+      "editarMensagemFeedbackNegativa",
+      bot.mensagem_feedback_negativa || "",
+    );
+    setValueById("editarGeneroChatbot", bot.genero || "");
+    const cbVideo = document.getElementById("editarVideoEnabledChatbot");
+    if (cbVideo) cbVideo.checked = !!bot.video_enabled;
+
+    // Block/unblock fields based on video_enabled state
+    const isVideoEnabled = !!bot.video_enabled;
+    const nomeInput = document.getElementById("editarNomeChatbot");
+    const iconInput = document.getElementById("editarIconChatbot");
+    const generoSelect = document.getElementById("editarGeneroChatbot");
+
+    if (nomeInput) {
+      nomeInput.disabled = isVideoEnabled;
+      nomeInput.style.opacity = isVideoEnabled ? "0.6" : "1";
+      nomeInput.style.cursor = isVideoEnabled ? "not-allowed" : "text";
+    }
+    if (iconInput) {
+      // Allow avatar updates even when video is enabled.
+      iconInput.disabled = false;
+      iconInput.style.opacity = "1";
+      iconInput.style.cursor = "pointer";
+    }
+    if (generoSelect) {
+      generoSelect.disabled = isVideoEnabled;
+      generoSelect.style.opacity = isVideoEnabled ? "0.6" : "1";
+      generoSelect.style.cursor = isVideoEnabled ? "not-allowed" : "pointer";
+    }
+
+    const previewIcon = document.getElementById("previewIcon");
+    if (previewIcon) {
+      previewIcon.src =
+        bot.icon_path || "/static/images/chatbot/chatbot-icon.png";
+      previewIcon.style.display = bot.icon_path ? "block" : "none";
+    }
+
+    const editarForm = document.getElementById("editarChatbotForm");
+    if (editarForm) {
+      editarForm.setAttribute("data-edit-id", chatbot_id);
+
+      // Track old values to detect video-relevant changes on submit
+      editarForm.dataset.oldNome = (bot.nome || "").trim();
+      editarForm.dataset.oldIdioma = (bot.idioma || "pt").trim().toLowerCase();
+      editarForm.dataset.oldGenero = (bot.genero || "").trim();
+      editarForm.dataset.oldGreetingVideoText = (
+        bot.greeting_video_text || ""
+      ).trim();
+      editarForm.dataset.oldMensagemSemResposta = (
+        bot.mensagem_sem_resposta || ""
+      ).trim();
+      editarForm.dataset.oldMensagemFeedbackPositiva = (
+        bot.mensagem_feedback_positiva || ""
+      ).trim();
+      editarForm.dataset.oldMensagemFeedbackNegativa = (
+        bot.mensagem_feedback_negativa || ""
+      ).trim();
+      editarForm.dataset.oldVideoEnabled = bot.video_enabled ? "1" : "0";
+    }
 
     await mostrarModalEditarChatbot(chatbot_id);
     document.getElementById("modalEditarChatbot").style.display = "flex";
@@ -412,72 +934,54 @@ window.abrirModalAtualizar = async function(chatbot_id) {
 };
 
 async function mostrarModalEditarChatbot(chatbot_id) {
-  const catDiv = document.getElementById("editarCategoriasChatbot");
-  if (!catDiv) return;
+  const catView = document.getElementById("editarCategoriasChatbotView");
+  if (!catView) return;
 
   try {
-    const categoriasAssociadas = await fetch(`/chatbots/${chatbot_id}/categorias`).then(r => r.json());
-    if (categoriasAssociadas.length === 0) {
-      catDiv.innerHTML = `<span style="color:#888;">Nenhuma categoria associada a este chatbot.</span>`;
-    } else {
-      catDiv.innerHTML = categoriasAssociadas.map(cat => `
-        <label style="display:flex;align-items:center;gap:4px;">
-          <input type="checkbox" name="categorias[]" value="${cat.categoria_id}" checked>
-          ${cat.nome}
-        </label>
-      `).join("");
+    const categoriasAssociadas = await fetch(
+      `/chatbots/${chatbot_id}/categorias`,
+    ).then((r) => r.json());
+    if (!categoriasAssociadas || categoriasAssociadas.length === 0) {
+      catView.innerHTML =
+        '<div style="color:#777;">Nenhuma categoria associada a este chatbot.</div>';
+      return;
     }
+    catView.innerHTML = categoriasAssociadas
+      .map((c) => `<div class="cat-item">${c.nome}</div>`)
+      .join("");
   } catch (err) {
-    catDiv.innerHTML = `<span style="color:red;">Erro ao carregar categorias: ${err.message}</span>`;
+    catView.innerHTML = `<div style="color:#b91c1c;">Erro ao carregar categorias: ${err.message}</div>`;
   }
 }
 
 async function atualizarCategoriasDoChatbot(chatbot_id) {
-  const catDiv = document.getElementById("editarCategoriasChatbot");
-  if (!catDiv) return;
+  // Categories are managed via the dedicated "Gerir Categorias" modal now.
+  return;
 
   try {
-    const checks = Array.from(catDiv.querySelectorAll("input[type=checkbox]"));
-    const selecionadas = checks.filter(cb => cb.checked).map(cb => parseInt(cb.value));
-
-    const associadasResp = await fetch(`/chatbots/${chatbot_id}/categorias`);
-    const associadas = await associadasResp.json();
-    const associadasIds = associadas.map(c => c.categoria_id);
-
-    const toAdd = selecionadas.filter(id => !associadasIds.includes(id));
-    const toRemove = associadasIds.filter(id => !selecionadas.includes(id));
-
-    for (const catId of toAdd) {
-      await fetch(`/chatbots/${chatbot_id}/categorias`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ categoria_id: catId })
-      });
-    }
-    for (const catId of toRemove) {
-      await fetch(`/chatbots/${chatbot_id}/categorias/${catId}`, { method: "DELETE" });
-    }
+    // noop
   } catch (err) {
-    alert("Erro ao atualizar categorias: " + err.message);
+    // noop
   }
 }
 
-window.abrirModalAdicionarFAQ = async function(chatbot_id) {
+window.abrirModalAdicionarFAQ = async function (chatbot_id) {
   const modal = document.getElementById("modalAdicionarFAQ");
   if (!modal) {
     console.error("Modal not found");
     return;
   }
-  
+
   modal.setAttribute("data-chatbot-id", chatbot_id);
   document.getElementById("faqChatbotId").value = chatbot_id;
   document.getElementById("docxChatbotId").value = chatbot_id;
   document.getElementById("pdfChatbotId").value = chatbot_id;
-  
+  resetarCamposLinksFAQ();
+
   modal.style.display = "flex";
-  
-  await new Promise(resolve => setTimeout(resolve, 50));
-  
+
+  await new Promise((resolve) => setTimeout(resolve, 50));
+
   await atualizarCategoriasFAQForm(chatbot_id);
   await carregarFAQsRelacionadasModal(chatbot_id);
   document.getElementById("mensagemFAQ").textContent = "";
@@ -490,8 +994,10 @@ async function atualizarCategoriasFAQForm(chatbot_id) {
 
   try {
     if (!chatbot_id) return;
-    const cats = await fetch(`/chatbots/${chatbot_id}/categorias`).then(r => r.json());
-    cats.forEach(cat => {
+    const cats = await fetch(`/chatbots/${chatbot_id}/categorias`).then((r) =>
+      r.json(),
+    );
+    cats.forEach((cat) => {
       const opt = document.createElement("option");
       opt.value = cat.categoria_id;
       opt.textContent = cat.nome;
@@ -514,33 +1020,33 @@ async function carregarFAQsRelacionadasModal(chatbot_id) {
       console.error("No chatbot_id provided");
       return;
     }
-    
+
     console.log("Loading FAQs for chatbot:", chatbot_id);
     const response = await fetch(`/faqs/chatbot/${chatbot_id}`);
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const faqs = await response.json();
     console.log("FAQs loaded:", faqs);
-    
+
     if (!Array.isArray(faqs)) {
       console.error("Expected array but got:", typeof faqs, faqs);
       return;
     }
-    
+
     let wasInitialized = false;
-    if (typeof $ !== 'undefined' && $(select).length) {
+    if (typeof $ !== "undefined" && $(select).length) {
       const $select = $(select);
-      if ($select.hasClass('select2-hidden-accessible')) {
+      if ($select.hasClass("select2-hidden-accessible")) {
         wasInitialized = true;
-        $select.select2('destroy');
+        $select.select2("destroy");
         console.log("Select2 destroyed before updating options");
       }
     }
-    
-    select.innerHTML = '';
+
+    select.innerHTML = "";
 
     // Adicionar FAQs como opções
     if (faqs.length === 0) {
@@ -551,37 +1057,38 @@ async function carregarFAQsRelacionadasModal(chatbot_id) {
       option.disabled = true;
       select.appendChild(option);
     } else {
-      faqs.forEach(faq => {
+      faqs.forEach((faq) => {
         const option = document.createElement("option");
         option.value = faq.faq_id;
-        // Truncar a pergunta para evitar overflow
         const pergunta = faq.pergunta || `FAQ ${faq.faq_id}`;
-        const truncatedPergunta = pergunta.length > 60 ? pergunta.substring(0, 60) + '...' : pergunta;
-        option.textContent = truncatedPergunta;
-        option.title = pergunta; 
+        const label = (faq.identificador || "").trim();
+        const truncatedPergunta =
+          pergunta.length > 60 ? pergunta.substring(0, 60) + "..." : pergunta;
+        option.textContent = label || truncatedPergunta;
+        option.title = label ? `${label} — ${pergunta}` : pergunta;
         select.appendChild(option);
       });
       console.log(`Added ${faqs.length} FAQ options to select`);
     }
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
     // Inicializar Select2 (sempre reinicializar para garantir que está atualizado)
-    if (typeof $ !== 'undefined') {
+    if (typeof $ !== "undefined") {
       const $select = $(select);
       if ($select.length) {
         try {
-          const $modal = $('#modalAdicionarFAQ');
+          const $modal = $("#modalAdicionarFAQ");
           $select.select2({
-            placeholder: 'Escolha uma ou mais FAQs relacionadas',
-            width: '100%',
+            placeholder: "Escolha uma ou mais FAQs relacionadas",
+            width: "100%",
             allowClear: true,
-            dropdownParent: $modal.length ? $modal : $('body'),
+            dropdownParent: $modal.length ? $modal : $("body"),
             language: {
-              noResults: function() {
+              noResults: function () {
                 return "Nenhum resultado encontrado";
-              }
-            }
+              },
+            },
           });
           console.log("Select2 initialized successfully");
         } catch (select2Error) {
@@ -602,120 +1109,233 @@ async function carregarFAQsRelacionadasModal(chatbot_id) {
   }
 }
 
-document.getElementById("formAdicionarFAQ").onsubmit = async function(e) {
-  e.preventDefault();
-  const chatbot_id = document.getElementById("faqChatbotId").value;
-  const designacao = this.elements["designacao"].value.trim();
-  const pergunta = this.elements["pergunta"].value.trim();
-  const resposta = this.elements["resposta"].value.trim();
-  const categoria_id = this.elements["categoria_id"].value;
-  const idioma = this.elements["idioma"].value;
-  const links_documentos = this.elements["links_documentos"].value.trim();
-  
-  // Obter valores selecionados do select múltiplo
-  const relacionadasSelect = this.elements["relacionadas[]"];
-  let relacionadas = "";
-  if (relacionadasSelect && relacionadasSelect.selectedOptions) {
-    const selectedValues = Array.from(relacionadasSelect.selectedOptions).map(opt => opt.value);
-    relacionadas = selectedValues.join(',');
-  }
+function resetarCamposLinksFAQ() {
+  const container = document.getElementById("faqLinksContainer");
+  if (!container) return;
+  container.innerHTML = "";
+  adicionarCampoLink(container);
+}
 
-  if (!designacao || !pergunta || !resposta || !categoria_id || !idioma) {
-    document.getElementById("mensagemFAQ").textContent = "Preencha todos os campos obrigatórios!";
-    document.getElementById("mensagemFAQ").style.color = "red";
-    return;
-  }
+function adicionarCampoLink(container) {
+  const row = document.createElement("div");
+  row.className = "link-doc-row";
+  row.style.display = "flex";
+  row.style.gap = "8px";
 
-  const body = { chatbot_id, designacao, pergunta, resposta, categoria_id, idioma, links_documentos, relacionadas };
-  try {
-    const res = await fetch("/faqs", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    const result = await res.json();
-    if (res.ok) {
-      document.getElementById("mensagemFAQ").textContent = "FAQ adicionada com sucesso!";
-      document.getElementById("mensagemFAQ").style.color = "green";
-      this.reset();
-      setTimeout(() => {
-        window.fecharModalAdicionarFAQ();
-        carregarTabelaBots();
-      }, 1000);
+  const input = document.createElement("input");
+  input.type = "url";
+  input.name = "links_documentos[]";
+  input.className = "link-doc-input";
+  input.placeholder = "https://exemplo.com/documento.pdf";
+  input.style.flex = "1";
+
+  const removeBtn = document.createElement("button");
+  removeBtn.type = "button";
+  removeBtn.textContent = "×";
+  removeBtn.className = "btn-remover-link";
+  removeBtn.style.minWidth = "90px";
+  removeBtn.onclick = () => {
+    const rows = container.querySelectorAll(".link-doc-row");
+    if (rows.length > 1) {
+      row.remove();
     } else {
-      document.getElementById("mensagemFAQ").textContent = "Erro: " + (result.error || result.erro);
+      input.value = "";
+    }
+  };
+
+  row.appendChild(input);
+  row.appendChild(removeBtn);
+  container.appendChild(row);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const addLinkBtn = document.getElementById("faqAddLinkBtn");
+  const container = document.getElementById("faqLinksContainer");
+  if (addLinkBtn && container) {
+    addLinkBtn.onclick = () => adicionarCampoLink(container);
+  }
+});
+
+const formAdicionarFAQ = document.getElementById("formAdicionarFAQ");
+if (formAdicionarFAQ) {
+  formAdicionarFAQ.onsubmit = async function (e) {
+    e.preventDefault();
+    const chatbot_id = document.getElementById("faqChatbotId").value;
+    const designacao = this.elements["designacao"].value.trim();
+    const identificador = this.elements["identificador"]?.value?.trim() || "";
+    const pergunta = this.elements["pergunta"].value.trim();
+    const serve_text = this.elements["serve_text"]
+      ? this.elements["serve_text"].value.trim()
+      : "";
+    const resposta = this.elements["resposta"].value.trim();
+    const categoria_id = this.elements["categoria_id"].value;
+    const idioma = this.elements["idioma"].value;
+    const links_documentos = Array.from(
+      this.querySelectorAll('input[name="links_documentos[]"]'),
+    )
+      .map((input) => input.value.trim())
+      .filter(Boolean)
+      .join(",");
+
+    // Obter valores selecionados do select múltiplo
+    const relacionadasSelect = this.elements["relacionadas[]"];
+    let relacionadas = "";
+    if (relacionadasSelect && relacionadasSelect.selectedOptions) {
+      const selectedValues = Array.from(relacionadasSelect.selectedOptions).map(
+        (opt) => opt.value,
+      );
+      relacionadas = selectedValues.join(",");
+    }
+
+    if (!designacao || !pergunta || !resposta || !categoria_id || !idioma) {
+      document.getElementById("mensagemFAQ").textContent =
+        "Preencha todos os campos obrigatórios!";
+      document.getElementById("mensagemFAQ").style.color = "red";
+      return;
+    }
+
+    const body = {
+      chatbot_id,
+      designacao,
+      identificador,
+      pergunta,
+      serve_text,
+      resposta,
+      categoria_id,
+      idioma,
+      links_documentos,
+      relacionadas,
+    };
+    try {
+      const res = await fetch("/faqs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const result = await res.json();
+      if (res.ok) {
+        document.getElementById("mensagemFAQ").textContent =
+          "FAQ adicionada com sucesso!";
+        document.getElementById("mensagemFAQ").style.color = "green";
+        this.reset();
+        setTimeout(() => {
+          window.fecharModalAdicionarFAQ();
+          carregarTabelaBots();
+        }, 1000);
+      } else {
+        document.getElementById("mensagemFAQ").textContent =
+          "Erro: " + (result.error || result.erro);
+        document.getElementById("mensagemFAQ").style.color = "red";
+      }
+    } catch (err) {
+      document.getElementById("mensagemFAQ").textContent =
+        "Erro ao comunicar com o servidor: " + err.message;
       document.getElementById("mensagemFAQ").style.color = "red";
     }
-  } catch (err) {
-    document.getElementById("mensagemFAQ").textContent = "Erro ao comunicar com o servidor: " + err.message;
-    document.getElementById("mensagemFAQ").style.color = "red";
-  }
-};
+  };
+}
 
-document.getElementById("formUploadDocxFAQ").onsubmit = async function(e) {
-  e.preventDefault();
-  const chatbot_id = document.getElementById("docxChatbotId").value;
-  const formData = new FormData(this);
-  formData.append("chatbot_id", chatbot_id);
+const formUploadDocxFAQ = document.getElementById("formUploadDocxFAQ");
+if (formUploadDocxFAQ) {
+  formUploadDocxFAQ.onsubmit = async function (e) {
+    e.preventDefault();
+    const chatbot_id = document.getElementById("docxChatbotId").value;
+    const formData = new FormData(this);
+    formData.append("chatbot_id", chatbot_id);
 
-  try {
-    const res = await fetch("/upload-faq-docx", {
-      method: "POST",
-      body: formData
-    });
-    const result = await res.json();
-    if (res.ok) {
-      document.querySelector("#formUploadDocxFAQ .uploadStatus").textContent = "Upload bem-sucedido!";
-      document.querySelector("#formUploadDocxFAQ .uploadStatus").style.color = "green";
-      this.reset();
-    } else {
-      document.querySelector("#formUploadDocxFAQ .uploadStatus").textContent = "Erro: " + (result.error || result.erro);
-      document.querySelector("#formUploadDocxFAQ .uploadStatus").style.color = "red";
+    try {
+      const res = await fetch("/upload-faq-docx-multiplos", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await res.json();
+      if (res.ok) {
+        document.querySelector("#formUploadDocxFAQ .uploadStatus").textContent =
+          "Upload bem-sucedido!";
+        document.querySelector("#formUploadDocxFAQ .uploadStatus").style.color =
+          "green";
+        this.reset();
+        try {
+          if (chatbot_id !== "todos") {
+            carregarTabelaFAQs(parseInt(chatbot_id), true);
+          }
+        } catch (e) {}
+      } else if (res.status === 409 && result && result.busy) {
+        // Show global busy modal (same UX as FAQ video busy)
+        if (typeof mostrarModalVideoBusy === "function") {
+          mostrarModalVideoBusy(
+            result.error ||
+              "Já existe um vídeo a ser gerado neste momento. Aguarde que termine.",
+          );
+        } else {
+          const m = document.getElementById("modalVideoBusy");
+          if (m) m.style.display = "flex";
+        }
+      } else {
+        document.querySelector("#formUploadDocxFAQ .uploadStatus").textContent =
+          "Erro: " + (result.error || result.erro);
+        document.querySelector("#formUploadDocxFAQ .uploadStatus").style.color =
+          "red";
+      }
+    } catch (err) {
+      document.querySelector("#formUploadDocxFAQ .uploadStatus").textContent =
+        "Erro ao enviar: " + err.message;
+      document.querySelector("#formUploadDocxFAQ .uploadStatus").style.color =
+        "red";
     }
-  } catch (err) {
-    document.querySelector("#formUploadDocxFAQ .uploadStatus").textContent = "Erro ao enviar: " + err.message;
-    document.querySelector("#formUploadDocxFAQ .uploadStatus").style.color = "red";
-  }
-};
+  };
+}
+const formUploadPDFFAQ = document.getElementById("formUploadPDFFAQ");
+if (formUploadPDFFAQ) {
+  formUploadPDFFAQ.onsubmit = async function (e) {
+    e.preventDefault();
+    const chatbot_id = document.getElementById("pdfChatbotId").value;
+    const formData = new FormData(this);
+    formData.append("chatbot_id", chatbot_id);
 
-document.getElementById("formUploadPDFFAQ").onsubmit = async function(e) {
-  e.preventDefault();
-  const chatbot_id = document.getElementById("pdfChatbotId").value;
-  const formData = new FormData(this);
-  formData.append("chatbot_id", chatbot_id);
-
-  try {
-    const res = await fetch("/upload-pdf", {
-      method: "POST",
-      body: formData
-    });
-    const result = await res.json();
-    if (res.ok) {
-      document.querySelector("#formUploadPDFFAQ .uploadStatusPDF").textContent = "Upload bem-sucedido!";
-      document.querySelector("#formUploadPDFFAQ .uploadStatusPDF").style.color = "green";
-      this.reset();
-    } else {
-      document.querySelector("#formUploadPDFFAQ .uploadStatusPDF").textContent = "Erro: " + (result.error || result.erro);
-      document.querySelector("#formUploadPDFFAQ .uploadStatusPDF").style.color = "red";
+    try {
+      const res = await fetch("/upload-pdf", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await res.json();
+      if (res.ok) {
+        document.querySelector(
+          "#formUploadPDFFAQ .uploadStatusPDF",
+        ).textContent = "Upload bem-sucedido!";
+        document.querySelector(
+          "#formUploadPDFFAQ .uploadStatusPDF",
+        ).style.color = "green";
+        this.reset();
+      } else {
+        document.querySelector(
+          "#formUploadPDFFAQ .uploadStatusPDF",
+        ).textContent = "Erro: " + (result.error || result.erro);
+        document.querySelector(
+          "#formUploadPDFFAQ .uploadStatusPDF",
+        ).style.color = "red";
+      }
+    } catch (err) {
+      document.querySelector("#formUploadPDFFAQ .uploadStatusPDF").textContent =
+        "Erro ao enviar: " + err.message;
+      document.querySelector("#formUploadPDFFAQ .uploadStatusPDF").style.color =
+        "red";
     }
-  } catch (err) {
-    document.querySelector("#formUploadPDFFAQ .uploadStatusPDF").textContent = "Erro ao enviar: " + err.message;
-    document.querySelector("#formUploadPDFFAQ .uploadStatusPDF").style.color = "red";
-  }
-};
+  };
+}
 
-window.fecharModalAdicionarFAQ = function() {
+window.fecharModalAdicionarFAQ = function () {
   const modal = document.getElementById("modalAdicionarFAQ");
   if (modal) modal.style.display = "none";
 };
 
-window.fecharModalEditarChatbot = function() {
+window.fecharModalEditarChatbot = function () {
   const modal = document.getElementById("modalEditarChatbot");
   if (modal) modal.style.display = "none";
   document.getElementById("previewIcon").style.display = "none";
 };
 
-window.fecharModalNovoBot = function() {
+window.fecharModalNovoBot = function () {
   const modal = document.getElementById("modalNovoBot");
   if (modal) modal.style.display = "none";
 };

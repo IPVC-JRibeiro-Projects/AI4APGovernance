@@ -1,4 +1,4 @@
-async function carregarBots() { 
+async function carregarBots() {
   const container = document.getElementById("botsTabelaContainer");
   if (!container) return;
   container.innerHTML = "<p>A carregar bots...</p>";
@@ -9,13 +9,65 @@ async function carregarBots() {
       container.innerHTML = "<p>Nenhum bot encontrado.</p>";
       return;
     }
-    container.innerHTML = bots.map(bot => criarBotHTML(bot, bots)).join('');
+
+    // Sync global active chatbot from server (avoid stale localStorage across admins).
+    try {
+      const activeBot = bots.find((b) => !!b.ativo);
+      if (activeBot && activeBot.chatbot_id != null) {
+        localStorage.setItem("chatbotAtivo", String(activeBot.chatbot_id));
+        window.chatbotAtivo = parseInt(activeBot.chatbot_id);
+      }
+    } catch (e) {}
+
+    container.innerHTML = bots.map((bot) => criarBotHTML(bot, bots)).join("");
     if (typeof adicionarListenersFormulariosFAQ === "function")
       adicionarListenersFormulariosFAQ(bots);
     if (typeof adicionarListenersUploadDocx === "function")
       adicionarListenersUploadDocx(bots);
   } catch (e) {
     container.innerHTML = `<p style="color:red;">Erro ao carregar bots: ${e.message}</p>`;
+  }
+}
+
+function adicionarCampoLink(btnOrContainer) {
+  const container =
+    btnOrContainer
+      .closest?.(".links-docs-group")
+      ?.querySelector(".links-docs-container") ||
+    btnOrContainer.querySelector?.(".links-docs-container") ||
+    null;
+  if (!container) return;
+
+  const row = document.createElement("div");
+  row.className = "link-doc-row";
+
+  const input = document.createElement("input");
+  input.type = "url";
+  input.name = "links_documentos[]";
+  input.className = "link-doc-input";
+  input.placeholder = "https://exemplo.com/documento.pdf";
+
+  const removeBtn = document.createElement("button");
+  removeBtn.type = "button";
+  removeBtn.className = "btn-remover-link";
+  removeBtn.textContent = "×";
+  removeBtn.onclick = () => removerCampoLink(removeBtn);
+
+  row.appendChild(input);
+  row.appendChild(removeBtn);
+  container.appendChild(row);
+}
+
+function removerCampoLink(btn) {
+  const row = btn.closest(".link-doc-row");
+  const container = btn.closest(".links-docs-container");
+  if (!row || !container) return;
+  const rows = container.querySelectorAll(".link-doc-row");
+  if (rows.length > 1) {
+    row.remove();
+  } else {
+    const input = row.querySelector("input");
+    if (input) input.value = "";
   }
 }
 
@@ -26,39 +78,47 @@ function carregarFAQsRelacionadas(chatbotId) {
   if (!$select.length) return;
 
   fetch(`/faqs/chatbot/${chatbotId}`)
-    .then(resp => resp.json())
-    .then(data => {
-      if ($select.hasClass('select2-hidden-accessible')) {
-        $select.select2('destroy');
+    .then((resp) => resp.json())
+    .then((data) => {
+      if ($select.hasClass("select2-hidden-accessible")) {
+        $select.select2("destroy");
       }
-      
+
       $select.empty();
 
-      data.forEach(faq => {
-        // Truncar a pergunta para evitar overflow
+      data.forEach((faq) => {
+        // Mostrar identificador prioritário; se não existir, usar pergunta truncada
         const pergunta = faq.pergunta || `FAQ ${faq.faq_id}`;
-        const truncatedPergunta = pergunta.length > 60 ? pergunta.substring(0, 60) + '...' : pergunta;
-        const option = new Option(truncatedPergunta, faq.faq_id, false, false);
-        option.title = pergunta; // Mostrar texto completo no hover
+        const label = (faq.identificador || "").trim();
+        const truncatedPergunta =
+          pergunta.length > 60 ? pergunta.substring(0, 60) + "..." : pergunta;
+        const option = new Option(
+          label || truncatedPergunta,
+          faq.faq_id,
+          false,
+          false
+        );
+        option.title = label ? `${label} — ${pergunta}` : pergunta; // Mostrar info completa no hover
         $select.append(option);
       });
 
-      const $modal = $select.closest('.bot-dropdown').closest('.bot-wrapper').find('.bot-dropdown');
-      const dropdownParent = $modal.length ? $modal : $('body');
-      
+      const $modal = $select
+        .closest(".bot-dropdown")
+        .closest(".bot-wrapper")
+        .find(".bot-dropdown");
+      const dropdownParent = $modal.length ? $modal : $("body");
+
       $select.select2({
-        placeholder: 'Escolha uma ou mais FAQs relacionadas',
-        width: '100%',
+        placeholder: "Escolha uma ou mais FAQs relacionadas",
+        width: "100%",
         allowClear: true,
-        dropdownParent: dropdownParent
+        dropdownParent: dropdownParent,
       });
     })
-    .catch(err => {
-      console.error('Erro ao carregar FAQs relacionadas:', err);
+    .catch((err) => {
+      console.error("Erro ao carregar FAQs relacionadas:", err);
     });
 }
-
-
 
 function gerarOptionsChatbotSelect(allBots) {
   let options = `<option value="" disabled selected hidden>Escolha o chatbot</option>`;
@@ -80,10 +140,15 @@ function gerarOptionsIdiomaSelect() {
 
 function criarBotHTML(bot, allBots) {
   const dataCriacao = bot.data_criacao
-    ? new Date(bot.data_criacao).toLocaleDateString('pt-PT', { day: '2-digit', month: 'short', year: 'numeric' })
+    ? new Date(bot.data_criacao).toLocaleDateString("pt-PT", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
     : "-";
   const optionsHtml = gerarOptionsChatbotSelect(allBots);
   const idiomaSelectHtml = gerarOptionsIdiomaSelect();
+  const isActive = !!bot.ativo;
   return `
     <div class="bot-wrapper">
       <div class="bot-item nao-publicado" data-chatbot-id="${bot.chatbot_id}" onclick="toggleBotDropdown(this)">
@@ -92,14 +157,14 @@ function criarBotHTML(bot, allBots) {
           <span class="status">
             Estado: Não Publicado - Município • ${dataCriacao}
           </span>
-          <span class="ativo-label" style="display: none; margin-left: 10px; color: #3c763d; font-weight: bold;">
+          <span class="ativo-label" style="display: ${isActive ? "inline" : "none"}; margin-left: 10px; color: #3c763d; font-weight: bold;">
             • Chatbot Ativo
           </span>
         </div>
         <span class="dropdown-icon">▼</span>
       </div>
       <div class="bot-dropdown" style="display: none;">
-        <button class="bot-ativo-btn" onclick="definirAtivo(event, ${bot.chatbot_id})">Ficar Ativo</button>
+        <button class="bot-ativo-btn ${isActive ? "ativo" : ""}" onclick="definirAtivo(event, ${bot.chatbot_id})">${isActive ? "Ativo" : "Ficar Ativo"}</button>
         <button class="bot-editar-btn" onclick="event.stopPropagation(); abrirModalEditarChatbot(${bot.chatbot_id});" style="margin-left: 10px;">Atualizar</button>
         <button class="bot-eliminar-btn" onclick="event.stopPropagation(); abrirModalEliminarBot(${bot.chatbot_id});" style="margin-left: 10px; background: #ea4d4d; color: #fff;">Eliminar</button>
         <h3>Escolha a fonte para as respostas do chatbot</h3>
@@ -113,8 +178,8 @@ function criarBotHTML(bot, allBots) {
             <p>Respostas aproximadas com base vetorial.</p>
           </div>
           <div class="card" data-fonte="faq+raga" onclick="selecionarFonte('faq+raga', this.closest('.bot-dropdown'))">
-            <h4>FAQ + fallback RAG</h4>
-            <p>Tenta responder com regras e usa RAG se falhar (não implementado).</p>
+            <h4>FAQ + GenAI</h4>
+            <p>Tenta responder com regras e usa RAG se falhar.</p>
           </div>
         </div>
         <hr class="linha-separadora">
@@ -126,8 +191,10 @@ function criarBotHTML(bot, allBots) {
               ${optionsHtml}
             </select>
             ${idiomaSelectHtml}
+            <input type="text" name="identificador" placeholder="Identificador (ex: APO-AIC-AM)" maxlength="120">
             <input type="text" name="designacao" placeholder="Designação" required>
             <input type="text" name="pergunta" placeholder="Pergunta" required>
+            <textarea name="serve_text" placeholder="Serve / A quem se destina..."></textarea>
             <textarea name="resposta" placeholder="Resposta" required></textarea>
             <select name="categoria_id" required>
               <option value="">Escolha a categoria</option>
@@ -138,7 +205,17 @@ function criarBotHTML(bot, allBots) {
               <option value="5">Desporto</option>
               <option value="6">Ambiente</option>
             </select>
-            <input type="text" name="links_documentos" placeholder="Links de Documentos (separados por vírgula)">
+            <div class="links-docs-group">
+              <label style="display:block; margin-bottom:4px;">Links de documentos</label>
+              <div class="links-docs-container">
+                <div class="link-doc-row">
+                  <input type="url" name="links_documentos[]" class="link-doc-input" placeholder="https://exemplo.com/documento.pdf">
+                  <button type="button" class="btn-remover-link" onclick="removerCampoLink(this)">Remover</button>
+                </div>
+              </div>
+              <button type="button" class="btn-adicionar-link" onclick="adicionarCampoLink(this)">+ Adicionar link</button>
+              <small class="form-text">Um link por campo. Não é preciso vírgulas.</small>
+            </div>
             <label style="display:block; margin-top:6px; font-size: 0.9rem;">
   FAQs relacionadas
 </label>
@@ -155,12 +232,12 @@ function criarBotHTML(bot, allBots) {
             <div id="mensagemFAQ"></div>
           </form>
           <div>
-            <label>Ou carregar ficheiro .docx</label>
+            <label>Ou carregar ficheiro .docx/.odt</label>
             <form id="uploadForm-${bot.chatbot_id}" class="uploadForm" enctype="multipart/form-data">
               <select name="chatbot_id" required>
                 ${optionsHtml}
               </select>
-              <input type="file" name="file" accept=".docx" required>
+              <input type="file" name="file" accept=".docx,.odt" required>
               <button type="submit">Adicionar Documento</button>
               <div class="uploadStatus"></div>
             </form>
@@ -177,8 +254,12 @@ function toggleBotDropdown(botItem) {
   const dropdown = botItem.parentElement.querySelector(".bot-dropdown");
   const isCurrentlyOpen = botItem.classList.contains("expanded");
 
-  document.querySelectorAll(".bot-dropdown").forEach(el => el.style.display = "none");
-  document.querySelectorAll(".bot-item").forEach(el => el.classList.remove("expanded"));
+  document
+    .querySelectorAll(".bot-dropdown")
+    .forEach((el) => (el.style.display = "none"));
+  document
+    .querySelectorAll(".bot-item")
+    .forEach((el) => el.classList.remove("expanded"));
 
   if (isCurrentlyOpen) {
     window.chatbotSelecionado = null;
@@ -198,7 +279,8 @@ function toggleBotDropdown(botItem) {
 
     window.chatbotSelecionado = chatbotId;
     localStorage.setItem("chatbotSelecionado", chatbotId);
-    const fonteSalva = localStorage.getItem(`fonteSelecionada_bot${chatbotId}`) || "faq";
+    const fonteSalva =
+      localStorage.getItem(`fonteSelecionada_bot${chatbotId}`) || "faq";
     selecionarFonte(fonteSalva, dropdown);
     if (typeof carregarTabelaFAQs === "function") {
       carregarTabelaFAQs(chatbotId, true);
@@ -209,57 +291,80 @@ function toggleBotDropdown(botItem) {
   }
 }
 
-
-function selecionarFonte(fonte, dropdown = null) { 
+function selecionarFonte(fonte, dropdown = null) {
   window.fonteSelecionada = fonte;
   if (window.chatbotSelecionado) {
-    localStorage.setItem(`fonteSelecionada_bot${window.chatbotSelecionado}`, fonte);
+    localStorage.setItem(
+      `fonteSelecionada_bot${window.chatbotSelecionado}`,
+      fonte
+    );
   }
   if (!dropdown) {
-    dropdown = document.querySelector(`.bot-item[data-chatbot-id="${window.chatbotSelecionado}"]`)
+    dropdown = document
+      .querySelector(
+        `.bot-item[data-chatbot-id="${window.chatbotSelecionado}"]`
+      )
       ?.parentElement?.querySelector(".bot-dropdown");
   }
   if (!dropdown) {
     return;
   }
-  dropdown.querySelectorAll(".card").forEach(card => {
+  dropdown.querySelectorAll(".card").forEach((card) => {
     card.classList.toggle("active", card.dataset.fonte === fonte);
   });
 }
 
 function mostrarFormulario() {
-  const dropdownVisivel = document.querySelector(".bot-dropdown[style*='block']");
+  const dropdownVisivel = document.querySelector(
+    ".bot-dropdown[style*='block']"
+  );
   if (!dropdownVisivel) return;
   const container = dropdownVisivel.querySelector("#faqContainer");
   if (container) {
-    container.style.display = container.style.display === "none" ? "block" : "none";
+    container.style.display =
+      container.style.display === "none" ? "block" : "none";
   }
 }
 
-function definirAtivo(event, chatbotId) {
+async function definirAtivo(event, chatbotId) {
   event.stopPropagation();
   localStorage.setItem("chatbotAtivo", chatbotId);
   window.chatbotAtivo = chatbotId;
-  document.querySelectorAll(".bot-ativo-btn").forEach(btn => {
+  // Persist globally (server-side) so public users/new browsers inherit it.
+  try {
+    const r = await fetch(`/chatbots/${chatbotId}/active`, { method: "PUT" });
+    if (!r.ok) {
+      throw new Error("Falha ao ativar chatbot.");
+    }
+  } catch (e) {}
+  document.querySelectorAll(".bot-ativo-btn").forEach((btn) => {
     btn.classList.remove("ativo");
-    btn.textContent = "Ficar Ativo"; 
+    btn.textContent = "Ficar Ativo";
   });
-  const botAtivoBtn = event.target.closest(".bot-dropdown").querySelector(".bot-ativo-btn");
+  const botAtivoBtn = event.target
+    .closest(".bot-dropdown")
+    .querySelector(".bot-ativo-btn");
   if (botAtivoBtn) {
     botAtivoBtn.classList.add("ativo");
-    botAtivoBtn.textContent = "Ativo"; 
+    botAtivoBtn.textContent = "Ativo";
   }
   const indicador = document.getElementById("indicadorAtivo");
   if (indicador) {
     indicador.style.display = "block";
     indicador.textContent = "";
   }
-  document.querySelectorAll(".ativo-label").forEach(el => el.style.display = "none");
-  const label = document.querySelector(`.bot-item[data-chatbot-id="${chatbotId}"] .ativo-label`);
+  document
+    .querySelectorAll(".ativo-label")
+    .forEach((el) => (el.style.display = "none"));
+  const label = document.querySelector(
+    `.bot-item[data-chatbot-id="${chatbotId}"] .ativo-label`
+  );
   if (label) label.style.display = "inline";
-  const fonte = localStorage.getItem(`fonteSelecionada_bot${chatbotId}`) || "faq";
+  const fonte =
+    localStorage.getItem(`fonteSelecionada_bot${chatbotId}`) || "faq";
   window.fonteSelecionada = fonte;
-  const dropdown = document.querySelector(`.bot-item[data-chatbot-id="${chatbotId}"]`)
+  const dropdown = document
+    .querySelector(`.bot-item[data-chatbot-id="${chatbotId}"]`)
     ?.parentElement?.querySelector(".bot-dropdown");
   if (dropdown) {
     selecionarFonte(fonte, dropdown);
@@ -271,6 +376,23 @@ function definirAtivo(event, chatbotId) {
     if (typeof carregarFAQsDoBotSelecionado === "function")
       carregarFAQsDoBotSelecionado();
   }
+
+  // Sync chat UI/avatar immediately when active bot changes
+  try {
+    if (typeof atualizarNomeChatHeader === "function") {
+      await atualizarNomeChatHeader();
+    }
+    // Forçar refresh da conversa para aplicar nome/mensagem do chatbot ativo
+    if (typeof reiniciarConversa === "function") {
+      try {
+        // reset greeting playback (chat.js)
+        if (typeof hasPlayedGreeting !== "undefined") {
+          hasPlayedGreeting = false;
+        }
+      } catch (e) {}
+      await reiniciarConversa();
+    }
+  } catch (e) {}
 }
 
 window.carregarBots = carregarBots;

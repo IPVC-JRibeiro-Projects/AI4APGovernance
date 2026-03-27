@@ -4,6 +4,10 @@ from .auth import login_required
 app = Blueprint('admin', __name__)
 
 @app.route("/")
+def home():
+    return render_template("home.html")
+
+@app.route("/recursos")
 @login_required
 def index():
     return render_template("recursos.html")
@@ -13,13 +17,13 @@ def index():
 def contexto():
     return render_template("contexto.html")
 
-@app.route("/landing")
-def landing():
-    return render_template("landing.html")
+@app.route("/projeto")
+def projeto():
+    return render_template("projeto.html")
 
-@app.route("/landing-2")
-def landing_2():
-    return render_template("landing-2.html")
+@app.route("/embed/chatbot/<int:chatbot_id>")
+def embed_chatbot(chatbot_id):
+    return render_template("embed_chatbot.html", chatbot_id=chatbot_id)
 
 @app.route("/respostas")
 @login_required

@@ -23,7 +23,13 @@ header .bot-info img {
   font-size: 14px;
 }
 
-#publicarBtn {
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-action-btn {
   background: #d4af37;
   color: white;
   border: none;
@@ -33,8 +39,51 @@ header .bot-info img {
   transition: background 0.3s;
 }
 
-#publicarBtn:hover {
+.header-action-btn:hover {
   background: #e0c565;
+}
+
+.header-action-btn.secondary {
+  background: #6b7280;
+}
+
+.header-action-btn.secondary:hover {
+  background: #4b5563;
+}
+
+.auth-modal-feedback {
+  display: none;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.auth-modal-feedback.success {
+  display: block;
+  background: #ecfdf5;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.auth-modal-feedback.error {
+  display: block;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.auth-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.auth-modal-actions button {
+  width: auto;
+  margin-bottom: 0;
+  min-width: 130px;
 }
 
 form input,
@@ -149,6 +198,7 @@ form button:hover,
 .fonte-indicador { font-size: 0.97em; }
 
 .btn-ativo,
+.btn-publicar,
 .btn-editar,
 .btn-eliminar {
   padding: 7px 15px;
@@ -176,6 +226,20 @@ form button:hover,
   color: #2c2a2a;
 }
 
+.btn-publicar {
+  background: #ffe082;
+  color: #4e4a2d;
+}
+.btn-publicar.ativo,
+.btn-publicar:active {
+  background: #218838;
+  color: #fff;
+}
+.btn-publicar:hover {
+  background: #f1cf63;
+  color: #2c2a2a;
+}
+
 .btn-editar {
   background: #1976d2; 
   color: #fff;
@@ -191,6 +255,11 @@ form button:hover,
 }
 .btn-eliminar:hover {
   background: #e03939;
+}
+
+.btn-publicar:disabled {
+  cursor: not-allowed;
+  opacity: 0.95;
 }
 
 .btn-novo-bot-main, .btn-novo-bot {
@@ -936,6 +1005,65 @@ form button:hover,
 .btn-categorias:focus {
   background: #7e5cb7;
   color: #fff;
+}
+
+/* Links de documentos */
+.links-docs-group {
+  margin: 10px 0 12px;
+}
+.links-docs-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.links-docs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 240px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+.link-doc-row {
+  display: grid;
+  grid-template-columns: 1fr 42px;
+  gap: 8px;
+  align-items: center;
+}
+.link-doc-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d5d5d5;
+  border-radius: 6px;
+  font-size: 15px;
+  min-height: 44px;
+}
+.btn-remover-link {
+  background: #e5e5e5;
+  color: #444;
+  border: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  display: grid;
+  place-items: center;
+}
+.btn-remover-link:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.btn-adicionar-link {
+  background: #d4af37;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  margin-top: 10px;
+  width: 100%;
 }
 
 .estado-select-wrapper {
