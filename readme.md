@@ -84,7 +84,21 @@ This project aligns with the **FCT call objectives** and follows **European Comm
 <p align="center">
   <img src="assets/b4.jpg" alt="Chatbot with Avatar" width="1000"/>
 </p>
-
+<p align="center">
+  <img src="assets/3.jpg" alt="Chatbot with Avatar" width="1000"/>
+</p>
+<p align="center">
+  <img src="assets/5.jpg" alt="Chatbot with Avatar" width="1000"/>
+</p>
+<p align="center">
+  <img src="assets/7.jpg" alt="Chatbot with Avatar" width="1000"/>
+</p>
+<p align="center">
+  <img src="assets/8.jpg" alt="Chatbot with Avatar" width="1000"/>
+</p>
+<p align="center">
+  <img src="assets/9.jpg" alt="Chatbot with Avatar" width="1000"/>
+</p>
 ---
 
 ### Module 3 - Dashboard Implementation
@@ -96,6 +110,9 @@ This project aligns with the **FCT call objectives** and follows **European Comm
 
 <p align="center">
   <img src="assets/B2.jpg" alt="Descrição da imagem" width="1000"/>
+</p>
+<p align="center">
+  <img src="assets/B3.jpg" alt="Descrição da imagem" width="1000"/>
 </p>
    ---
 
