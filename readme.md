@@ -63,7 +63,7 @@ This project aligns with the **FCT call objectives** and follows **European Comm
 `/chatbot`  
 
 <p align="center">
-  <img src="assets/Image20250925101453.png" alt="Descrição da imagem" width="500"/>
+  <img src="assets/Image20250925101453.png" alt="Descrição da imagem" width="1000"/>
 </p>
 
 ---
@@ -72,17 +72,17 @@ This project aligns with the **FCT call objectives** and follows **European Comm
 `/email-add-on`  
 
 <p align="center">
-  <img src="assets/image5.png" alt="Descrição da imagem" width="500"/>
+  <img src="assets/image5.png" alt="Descrição da imagem" width="1000"/>
 </p>
 
 ---
 
 ### Module 3 - Chatbot with Avatar
 <p align="center">
-  <img src="assets/b3.jpg" alt="Chatbot with Avatar" width="500"/>
+  <img src="assets/b3.jpg" alt="Chatbot with Avatar" width="1000"/>
 </p>
 <p align="center">
-  <img src="assets/b4.jpg" alt="Chatbot with Avatar" width="500"/>
+  <img src="assets/b4.jpg" alt="Chatbot with Avatar" width="1000"/>
 </p>
 
 ---
