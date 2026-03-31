@@ -88,7 +88,7 @@ This project aligns with the **FCT call objectives** and follows **European Comm
 `/dashboards`  
 
 <p align="center">
-  <img src="assets/b1.jpg" alt="Descrição da imagem" width="500"/>
+  <img src="assets/B1.jpg" alt="Descrição da imagem" width="500"/>
 </p>
 
 
